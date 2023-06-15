@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<div th:fragment="navi" data-collapse="medium" data-animation="default" role="banner" class="navigation w-nav">
+  <div class="navigation_wrap">
+    <a href="/" aria-current="page" class="logo-link w-nav-brand w--current"><img th:src="@{/img/logo_white.png}" alt="로고" width="108" class="logo-image"></a>
+    <div class="menu">
+      <nav role="navigation" class="navigation_items w-nav-menu">
+        <ul class="nav_list">
+        <li><a href="/refrigeratorRecipe" class="navigation_item w-nav-link">냉장고 속 레시피</a></li>
+        <li><a href="/board/" class="navigation_item w-nav-link">레시피 공유</a></li>
+        <Li><a href="#" class="navigation_item w-nav-link">요리자랑</a></li>
+        </ul>
+      </nav>
+    </div>
+    <div class="right_nav">
+<!--      <a href="/member/login" class="login_btn inter">로그인</a>-->
+      <button type="button" class="ref_btn" sec:authorize="isAnonymous()">
+          <img th:src="@{/img/default_ref.png}" alt="냉장고" class="ref_img" style="filter: grayscale(100%);"></button>
+      <a href="/member/login" class="login_btn inter" sec:authorize="isAnonymous()">로그인</a>
+        <button type="button" class="ref_btn" sec:authorize="isAuthenticated()">
+            <img th:src="@{/img/default_ref.png}" alt="냉장고" class="ref_img"></button>
+        <div sec:authorize="isAuthenticated()">
+            <button type="button" id="show_list" class="ref_btn">
+            <img th:src="@{/img/default_profile.png}" alt="프로필 이미지" class="ref_img"></button>
+            <div class="mypage_form">
+                <div class="mypage_list">
+                    <a href="/mypage/">내 활동</a><hr>
+                    <a href="/mypage/">레시피북</a><hr>
+                    <a href="/mypage/">나의 쉐프</a><hr>
+                    <a href="/mypage/">프로필 관리</a><hr>
+                    <a href="/member/logout">로그아웃</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+  </div>
+</div>
+<!--<script th:inline="javasript">-->
+<!--    $('#show_list').click(function(){-->
+<!--    -->
+<!--    })-->
+<!--</script>-->
+</html>

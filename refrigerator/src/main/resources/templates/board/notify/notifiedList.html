@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<style>
+	.writingId, .commentId, .boardId, .notifiedReason{
+		display: none;
+	}
+	
+	li{
+		display: inline-block;
+	}
+	
+</style>
+<script src="https://code.jquery.com/jquery-3.6.4.js" integrity="sha256-a9jBBRygX1Bh5lt8GZjXDzyOB+bWve9EiO7tROUtj/E=" crossorigin="anonymous"></script>
+<script th:inline="javascript">
+	function bannedAndDelete(t){
+		var member = $('.'+t+'member').text();
+		var title = $('.'+t+'title').attr('value');
+		var content = $('.'+t+'notifiedContent').attr('value');
+		var notifiedMember = $('.'+t+'notifiedMember').text();
+		var notifiedCase = $('.'+t+'notifiedCase').text();
+		var notifiedReason = $('.'+t+'notifiedReason').text();
+		var writingId = $('.'+t+'writingId').text();
+		var commentId = $('.'+t+'commentId').text();
+		var boardId = $('.'+t+'boardId').text();
+		console.log(writingId);
+	
+		window.open('','checkNotified',"toolbar=no,directories=no,scrollbars=no,resizable=no,status=no,menubar=no,width=500, height=500, top=0,left=20")
+		$('#member').val(member);
+		$('#notifiedMember').val(notifiedMember);
+		$('#title').val(title);
+		$('#content').val(content);
+		$('#notifiedCase').val(notifiedCase);
+		$('#notifiedReason').val(notifiedReason);
+		$('#writingId').val(writingId);
+		$('#commentId').val(commentId);
+		$('#boardId').val(boardId);
+		$('#notifying').submit();
+		
+	}
+</script>
+</head>
+<body>
+
+	<table style="border: 1px solid black" cellspacing="20px">
+		<tr style="text-align: center;">
+			<td>신고번호</td>
+			<td>신고자</td>
+			<td>피신고자</td>
+			<td>제목</td>
+			<td>내용</td>
+			<td>신고일시</td>
+			<td>처리일시</td>
+			<td>유형</td>
+			<td>처리상태</td>
+		</tr>
+		<tr th:each="notify, i:${notifies}" style="text-align: center;">
+			<td th:text="${notify.notifiedNum}"></td>
+			<td th:text="${notify.member.memNick}+'('+${notify.member.memMail}+')'" th:class="'notify'+${i.count}+'member'"></td>
+			<td th:text="${notify.notifiedMember}" th:class="'notify'+${i.count}+'notifiedMember'"></td>
+			<td th:text="${notify.title.length()<20 ? notify.title : #strings.substring(notify.title,0,20)+'...'}" th:value="${notify.title}" th:class="'notify'+${i.count}+'title'"> 
+			<td th:text="${notify.notifiedContent.length()<20 ? notify.notifiedContent : #strings.substring(notify.notifiedContent,0,20)+'...'}" th:value="${notify.notifiedContent}" th:class="'notify'+${i.count}+'notifiedContent'">
+			<td th:text="${#temporals.format(notify.regDate,'yyyy-MM-dd HH:mm')}"></td>
+			<td th:text="${#temporals.format(notify.didDate,'yyyy-MM-dd HH:mm')==null?'----' : #temporals.format(notify.didDate,'yyyy-MM-dd HH:mm')}"></td>
+			<td th:text="${notify.notifiedCase}" th:class="'notify'+${i.count}+'notifiedCase'"></td>
+			<td><div th:if="${notify.did=='Y'}">처리</div><button th:if="${notify.did=='N'}" onclick="bannedAndDelete(this.value)" th:value="'notify'+${i.count}">미처리</button></td>
+			<td th:text="${notify.writingId}" th:class="'writingId notify'+${i.count}+'writingId'"></td>
+			<td th:text="${notify.commentId}" th:class="'commentId notify'+${i.count}+'commentId'"></td>
+			<td th:text="${notify.boardId}" th:class="'boardId notify'+${i.count}+'boardId'"></td>
+			<td th:text="${notify.notifiedReason}" th:class="'notifiedReason notify'+${i.count}+'notifiedReason'"></td>
+		</tr>
+	</table>
+	
+	<div th:with="start=${(notifies.number/maxPage)*maxPage + 1}, end=(${(notifies.totalPages == 0) ? 1 : (start + (maxPage - 1) < notifies.totalPages ? start + (maxPage - 1) : notifies.totalPages)})" >
+    <ul class="pagination justify-content-center">
+    <li class="page-item" th:each="page: ${#numbers.sequence(start, end)}" th:classappend="${notifies.number eq page-1}?'active':''">
+        <a th:inline="text" th:href="@{'/NotifiedList' +'?page=' + ${page-1}}" class="page-link">[[${page}]]</a>
+      </li>
+    </ul>
+	</div>
+	
+	<form method="post" th:action="@{/notifyingCheck}" th:object="${notifyingCheckDTO}" target="checkNotified" id="notifying" style="display: none;">
+		<input type="hidden" name="member" id="member"/>
+		<input type="hidden" name="notifiedMember" id="notifiedMember"/>
+		<input type="hidden" name="title" id="title"/>
+		<input type="hidden" name="content" id="content"/>
+		<input type="hidden" name="notifiedCase" id="notifiedCase"/>
+		<input type="hidden" name="notifiedReason" id="notifiedReason"/>
+		<input type="hidden" name="boardId" id="boardId"/>
+		<input type="hidden" name="writingId" id="writingId"/>
+		<input type="hidden" name="commentId" id="commentId"/>
+	</form>
+	
+
+</body>
+</html>

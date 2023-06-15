@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<style>
+	.contents{
+		width: 1000px;
+	}
+	.content{
+		margin-left : 20px;
+		display: inline-block;
+	}
+	img {
+		height: 200px;
+		width: 200px;
+	}
+	li{
+		display: inline-block;
+	}
+</style>
+<script th:inline="javascript">
+	function goWriting(){
+		var bannCheck = [[${member.memBanned}]]
+		var bannDate = [[${#temporals.format(member.bannDate,'yyyy-MM-dd HH:mm:ss')}]]
+		console.log(bannCheck);
+		if(bannCheck=='Y'){
+			alert('차단당하셨습니당. 차단기간은 ['+bannDate+'] 까지입니당')
+		}else{			
+		location.href='/CookWriting';
+		}
+	}
+</script>
+</head>
+<body>
+	<div th:if="${nonWriting}!=null">[[${nonWriting}]]</div>
+	<div class="contents">
+	<div class="content" th:each="cookBoard : ${cookBoards}">
+		
+		<img th:src="${cookBoard.cookImage.url}" onerror="this.src='/images/images/nonImage.png'">
+		<div><a th:href="'/CookBoardDetail?writingId='+${cookBoard.writingId}">[[${cookBoard.title}]]</a></div>
+		<div th:text="${cookBoard.member.memNick}"></div>
+		<div th:text="'조회수 '+${cookBoard.seenCount}"></div>
+		<div th:text="'추천수 '+${cookBoard.recomCount}"></div>
+	
+	</div>
+	</div>
+	
+<div th:with="start=${(cookBoards.number/maxPage)*maxPage + 1}, end=(${(cookBoards.totalPages == 0) ? 1 : (start + (maxPage - 1) < cookBoards.totalPages ? start + (maxPage - 1) : cookBoards.totalPages)})" >
+    <ul class="pagination justify-content-center">
+    <li class="page-item" th:each="page: ${#numbers.sequence(start, end)}" th:classappend="${cookBoards.number eq page-1}?'active':''">
+        <a th:inline="text" th:href="@{'/' +'?searchQuery=' + ${cookSearchDTO.searchQuery} + '&page=' + ${page-1}}" class="page-link">[[${page}]]</a>
+      </li>
+    </ul>
+</div>
+
+<form class="form-inline my-2 my-lg-0" th:action="@{/}" method="get">
+        <div class="form-inline justify-content-center" th:object="${cookSearchDTO}">
+            <select th:field="*{searchBy}" class="form-control" style="width:auto;">
+                <option value="title">제목</option>
+                <option value="nickName">작성자</option>
+            </select>
+            <input th:field="*{searchQuery}" type="text" class="form-control" placeholder="검색어를 입력해주세요">
+            <button id="searchBtn" type="submit" class="btn btn-primary">검색</button>
+        </div>
+</form>
+	
+	<button type="button" onclick="goWriting()">글쓰기</button>
+	
+</body>
+</html>

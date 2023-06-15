@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <meta charset="UTF-8">
+    <meta content="IE=edge" http-equiv="X-UA-Compatible">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+    <title>Login</title>
+    <link href="/css/create.css" rel="stylesheet" type="text/css"/>
+</head>
+
+<body>
+<div class="container" id="container">
+    <!-- FORM SECTION -->
+    <form action="/member/new" method="post" role="form" th:object="${memberDto}">
+        <input th:name="${_csrf.parameterName}" th:value="${_csrf.token}" type="hidden">
+        <div class="row">
+            <!-- SIGN UP -->
+            <div class="col align-items-center flex-col sign-up">
+                <div class="form-wrapper align-items-center">
+                    <div class="form sign-up">
+                        <div class="input-group">
+                            <i class='bx bxs-user'></i>
+                            <input id="inputName" oninput="validateName()" placeholder="Username" th:field="*{name}" type="text">
+                            <span id="validateName"></span>
+                        </div>
+                        <div class="input-group">
+                            <i class='bx bx-mail-send'></i>
+                            <input id="email2" oninput="validateEmail()" placeholder="Email" th:field="*{email}" type="email">
+                            <span id="checkEmail"></span>
+                        </div>
+                        <div class="input-group">
+                            <i class='bx bxs-user'></i>
+                            <input placeholder="Nickname" th:field="*{nickname}" type="text">
+                        </div>
+                        <div class="input-group" id="test">
+                            <i class='bx bxs-lock-alt'></i>
+                            <input id="PW" oninput="validatePassword()" placeholder="Password" th:field="*{password}" type="password">
+                            <span id="validatePW"></span>
+                        </div>
+                        <div class="input-group">
+                            <i class='bx bxs-lock-alt'></i>
+                            <input id="checkPW" type="password" placeholder="Confirm Password" oninput="validatePassword()">
+                            <span id="finalCheckPW"></span>
+                        </div>
+                        <button class="button btnPush" type="submit">Sign up</button>
+                        <p>
+                            <span>Already have an account?</span>
+                            <b class="pointer" onclick="location.href='/member/login'">
+                                Sign in here
+                            </b>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+            <!-- END SIGN UP -->
+        </div>
+    </form>
+    <!-- END FORM SECTION -->
+    <!-- CONTENT SECTION -->
+    <div class="row content-row">
+        <!-- SIGN IN CONTENT -->
+        <div class="col align-items-center flex-col">
+            <div class="text sign-in">
+                <h2>
+                    Welcome
+                </h2>
+            </div>
+        </div>
+        <!-- END SIGN IN CONTENT -->
+        <!-- SIGN UP CONTENT -->
+        <div class="col align-items-center flex-col">
+            <div class="text sign-up">
+                <h2>
+                    Join with us
+                </h2>
+
+            </div>
+        </div>
+        <!-- END SIGN UP CONTENT -->
+    </div>
+    <!-- END CONTENT SECTION -->
+</div>
+<script src="/js/create.js"></script>
+<script>
+    let pwComplete = 0;
+    let nameComplete = 0;
+    let emailComplete = 0;
+
+    $('form').submit(function () {
+      if (pwComplete == 1 && nameComplete == 1 && emailComplete == 1) {
+        return true;
+      }
+      else {
+        alert("제대로 입력되지 않았습니다.");
+        return false;
+      }
+    });
+
+    //validateName Start
+    function checkName(str) {
+      var regex = /^[가-힣]*$/; // 한글 정규표현식
+
+      return regex.test(str);
+    }
+
+    function validateName() {
+      var name = document.getElementById("inputName");
+      var validateName = document.getElementById("validateName");
+
+      if (name.value) {
+        if (!checkName(name.value)) {
+          validateName.innerHTML = "<span style='color:red'>유효하지 않은 입력입니다.</span>"
+          name.style.border = "0.125rem solid red"
+          nameComplete = 0;
+        } else {
+          validateName.innerHTML = "<span style='color:green'>유효한 입력입니다.</span>"
+          name.style.border = "0.125rem solid #4EA685"
+          nameComplete = 1;
+        }
+      } else {
+        validateName.innerHTML = "";
+        name.style.border = "0.125rem solid white";
+        nameComplete = 0;
+      }
+    }
+    //validateName End
+
+    //validateEmail Strat
+    var email2 = document.getElementById("email2");
+    var checkEmail = document.getElementById("checkEmail");
+
+    function combineEmail(str) {
+      // 이메일 유효성을 체크하는 정규식
+      var regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      console.log(regex.test(str));
+      return regex.test(str);
+    }
+
+    function validateEmail() {
+      if (email2.value) {
+        if (!combineEmail(email2.value)) {
+          checkEmail.innerHTML = "<span style='color:red'>유효한 이메일이 아닙니다.</span>";
+          email2.style.border = "0.125rem solid red";
+          emailComplete = 0;
+        } else {
+          checkEmail.innerHTML = "<span style='color:green'>유효한 이메일 입니다.</span>";
+          email2.style.border = "0.125rem solid #4EA685";
+          emailComplete = 1;
+        }
+      } else {
+        checkEmail.innerHTML = "";
+        email2.style.border = "0.125rem solid white";
+        emailComplete = 0;
+      }
+    }
+    //validateEmail End
+
+    //validatePassword Start
+    function combine(str) {
+      var checkNumAlpha = /[a-z0-9]/;
+      var checkLowercase = /[a-z]/;
+      var checkNumber = /[0-9]/;
+      var checkWildcard = /[!@#$%^&*]/;
+      var checkLength = /^.{8,16}$/
+
+
+      return checkNumAlpha.test(str) && checkLowercase.test(str) && checkNumber.test(str) && checkWildcard.test(str) && checkLength.test(str);
+    }
+
+    var PW = document.getElementById("PW");
+    var validatePW = document.getElementById("validatePW");
+    var checkPW = document.getElementById("checkPW");
+    var finalCheckPW = document.getElementById("finalCheckPW");
+
+    function validatePassword() {
+      //Password
+      if (PW.value) {
+        if (!combine(PW.value)) {
+          validatePW.innerHTML = "<span style='color:red'>영문,숫자,특수문자(필수) 조합 8자 이상 16자 이하</span>";
+          PW.style.border = "0.125rem solid red";
+          PW.focus();
+        } else {
+          validatePW.innerHTML = "<span style='color:green'>안전한 비밀번호입니다.</span>";
+          PW.style.border = "0.125rem solid #4EA685"
+        }
+      } else {
+        validatePW.innerHTML = "";
+        PW.style.border = "0.125rem solid white";
+      }
+
+      //Confirm Password
+      if (PW.value && checkPW.value) {
+        if (PW.value === checkPW.value) {
+          finalCheckPW.innerHTML = "<span style='color:green'>비밀번호가 일치합니다.</span>";
+          checkPW.style.border = "0.125rem solid #4EA685"
+          pwComplete = 1;
+        } else {
+          finalCheckPW.innerHTML = "<span style='color:red'>비밀번호가 불일치합니다.</span>";
+          checkPW.style.border = "0.125rem solid red"
+          pwComplete = 0;
+        }
+      } else {
+        finalCheckPW.innerHTML = "";
+        checkPW.style.border = "0.125rem solid white";
+        pwComplete = 0;
+      }
+    }
+    //validatePassword End
+
+
+
+
+
+
+</script>
+</body>
+</html>

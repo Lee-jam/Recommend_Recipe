@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<div th:fragment="navi" class="mypage_lnb doHyeon">
+    <div style="flex-grow:0;">
+        <a href="#" class="logo_tag"><img th:src="@{/img/logo_black.png}" alt="Logo" class="logo"></a>
+    </div>
+    <div style="flex-grow:0;">
+        <a href="#" class="nav_profile_img"><img th:src="@{/img/캡처.png}" alt="profileImg" class="profileImg"></a>
+    </div>
+    <div style="flex-grow:6;">
+        <div class="mypage_contents">
+            <ul style="list-style-type: none; padding: 0; margin:0;">
+                <li class="nav_menu__item">
+                    <a href="#" class="nav-menu__link toggle_menu" onclick="toggle_menu()">내 활동</a>
+                    <ul id="myMenu" class="nav_submenu" style="display: none;">
+                        <li><a href="#" class="nav_submenu_link">내 게시글</a></li>
+                        <li><a href="#" class="nav_submenu_link">내 댓글</a></li>
+                    </ul>
+                </li>
+                <li class="nav_menu__item"><a href="#" class="nav-menu__link">레시피북</a></li>
+                <li class="nav_menu__item"><a href="#" class="nav-menu__link">나의 쉐프</a></li>
+                <li class="nav_menu__item"><a href="#" class="nav-menu__link">프로필 관리</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="mypage_out">
+        <a class="go_mainPage out_page" href="/"><span style="padding: 15px 10px; display: block;">외출</span></a>
+    </div>
+
+</div>
+</html>

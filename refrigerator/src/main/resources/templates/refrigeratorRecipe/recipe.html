@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout1}">
+
+<div layout:fragment="content" class="in_ref_content doHyeon">
+    <main class="in_ref_main">
+        <div class="in_ref_div">
+            <div class="flex_grow1 my_ref_style recipePage1">
+                <h3>내 냉장고</h3>
+                <div>
+
+                </div>
+            </div>
+            <div class="flex_grow1 recipePage1">
+                <h2>냉장고 속 레시피</h2>
+                <div class="recipeTable">
+                <table style="width:90%; margin:0 auto;">
+                    <tr style="text-align: center;">
+                        <th style="width:25%;">메뉴</th>
+                        <th style="width:25%;">재료</th>
+                        <th style="width:20%;">보유재료수/총 재료</th>
+                        <th style="width:20%;">참고</th>
+                    </tr>
+                    <tr th:each="recipeList : ${recipeLists}">
+                        <td>
+                            <button id="detailRecipe" class="detailRecipe Sfont" th:text="${recipeList.rep_nm}" th:value="${recipeList}"></button>
+                        </td>
+                        <td class="Sfont"><span>재료</span><span>재료</span></td>
+                        <td class="Sfont" style="text-align:center;">02/03</td>
+                        <td class="Sfont" style="text-align:center;">
+                            <button class="blog_btn" th:value="${recipeList.rep_nm}">Blog</button>
+                            <button class="video_btn" th:value="${recipeList.rep_nm}">Video</button>
+                        </td>
+                    </tr>
+                </table>
+                </div>
+            </div>
+            <div class="flex_grow1 checkBlog">
+                <div class="mainTop">
+                <h3>블로그 조회</h3>
+                <button type="button" class="backbtn"><i class="fas fa-arrow-circle-left fa-3x" style="color: #606060;"></i></button>
+                </div>
+                <div class="recipeTable">
+                    <ul class="recipeBList">
+                    </ul>
+                </div>
+            </div>
+            <div class="flex_grow1 checkVideo">
+                <div class="mainTop">
+                    <h3>동영상 조회</h3>
+                    <button type="button" class="backbtn"><i class="fas fa-arrow-circle-left fa-3x" style="color: #606060;"></i></button>
+                </div>
+                <div class="recipeTable">
+                    <div class="recipeVList">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+<div layout:fragment="mask" id="mask">
+    <div class="youtube_flex">
+        <button id="closeVideo"><i class="far fa-times fa-2x" style="color: #ffffff; font-weight:600;"></i></button>
+        <iframe id="Yplayer" width="854px" height="480px" allow="accelerometer; autoplay; encrypted-media;" allowfullscreen>
+        </iframe>
+    </div>
+</div>
+<script layout:fragment="javascript" th:inline = "javascript">
+    $('.blog_btn').click(function(){
+    const name = $(this).val();
+    $.ajax({
+            type:'GET',
+            data:{"recipeName":name},
+            url:'/refrigeratorRecipe/blog',
+            success: function(data){
+                for(let i=0;i<data.length;i++){
+                    let html = '';
+                    html +='<li>';
+                    html +='<a href="'+data[i].link+'" target="_blank">';
+                    html +='<p>'+data[i].title+'</p>';
+                    html +='<p>'+data[i].snippet+'</p>';
+                    html +='<img src="'+data[i].cse_img+'" style="width:200px"></img>';
+                    html +='</a>';
+                    html +='</li>';
+                    $('.recipeBList').append(html);
+                };
+                $('.recipePage1').css('display','none');
+                $('.checkBlog').css('display','block');
+            },
+            error: function(){
+                console.error();
+            }
+        })
+    });
+
+    $('.video_btn').click(function(){
+    const name = $(this).val();
+    $.ajax({
+            type:'GET',
+            data:{"recipeName":name},
+            url:'/refrigeratorRecipe/video',
+            success: function(data){
+                for(let i=0;i<data.length;i++){
+                    console.log(data[i].title);
+                    let html = '';
+                    html +='<div style="margin-right: auto;">';
+                    html +='<button class="showTube" type="button" value="'+data[i].videoId+'">';
+                    html +='<img src="'+data[i].high_url+'" class="videoImg" style="width:300px;"></img>';
+                    html +='<p>'+data[i].title+'</p>';
+                    html +='</button>';
+                    html +='</div>';
+                    $('.recipeVList').append(html);
+                };
+                $('.recipePage1').css('display','none');
+                $('.checkVideo').css('display','block');
+            },
+            error: function(){
+                console.error();
+            }
+        })
+    });
+    $('.backbtn').click(function(){
+        if($('.checkBlog').css('display')=="block"){
+            $('.checkBlog').css('display','none');
+            $('.recipeBList *').remove();
+            $('.recipePage1').css('display','block');
+        }else{
+            $('.checkVideo').css('display','none');
+            $('.recipeVList *').remove();
+            $('.recipePage1').css('display','block');
+        };
+    })
+    $(document).on("click",".showTube",function(){
+            const videoId = $(this).val();
+            const url = 'https://www.youtube.com/embed/'+videoId;
+            $('#Yplayer').attr('src',url);
+            $('#mask').css('display','flex');
+    });
+    $('#closeVideo').click(function(){
+        $('#mask').css('display','none');
+        $('#Yplayer').attr('src',"");
+    })
+</script>
+</html>

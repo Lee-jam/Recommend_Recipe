@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout1}">
+
+
+<div layout:fragment="content" style="width:200vw" id="main_outline">
+    <div class="main_set">
+        <div class="main_position">
+        <div class="inter sub_sentence">하루 종일 고민했는데 또 고민?!<br>
+             고민은 이제 그만!</div>
+        <div class="doHyeon main_sentence">오늘 먹을 <span class="emphasis">요리 레시피</span>를<br> 추천해드립니다.</div>
+        <button type="button" id="call_bard" class="inter ai_btn">Cooking</button>
+        </div>
+        <button class ="movebtn moveToRcp1"><span>&rang;</span></button>
+    </div>
+    <div class="main_set">
+        <button class ="movebtn moveToRcp2"><span>&lang;</span></button>
+        <div><p id="radn_recipe"></p></div>
+    </div>
+</div>
+
+<div layout:fragment="mask" id="mask">
+    <img src="./img/loading.gif" alt="레시피 제조중..." style="width:300px;height:200px">
+</div>
+
+<script layout:fragment="javascript" th:inline = "javascript">
+  $("#call_bard").click(function(){
+    const mask = document.getElementById("mask");
+    mask.style.display = "flex";
+        $.ajax({
+            type:'POST',
+            url:'<RandomRecipeAPI URL>',
+            success: function(data){
+                $('#radn_recipe').text(data);
+                $('#radn_recipe').css('display','block');
+                $('.moveToRcp2').css('display','block');
+                $('#main_outline').css({"transition":"0.5s ease-in","transform":"translateX(-100vw)"});
+                mask.style.display = "none";
+                console.log(data);
+            },
+            error: function(){
+                mask.style.display = "none";
+                console.error();
+            }
+        })
+});
+$('.moveToRcp1').click(function(){
+    $('#main_outline').css({"transition":"0.5s ease-in","transform":"translateX(-100vw)"});
+    $('.moveToRcp2').css('display','block');
+    $('.moveToRcp1').css('display','none');
+    });
+$('.moveToRcp2').click(function(){
+    $('#main_outline').css({"transition":"0.5s ease-in","transform":"translateX(0)"});
+    $('.moveToRcp1').css('display','block');
+    $('.moveToRcp2').css('display','none');
+    });
+
+</script>

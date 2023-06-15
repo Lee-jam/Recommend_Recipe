@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<style>
+.contentBox{
+	border : 1px solid black;
+	width: 1000px;
+	min-height : 500px;
+	margin-bottom: 50px;
+}
+
+.commentBox{
+	border : 1px solid black;
+	width : 1000px;
+	min-height: 100px;
+}
+
+.nick{
+	display: inline-block;
+}
+
+.seenCount{
+	display: inline-block;
+}
+
+.recomCount{
+	display: inline-block;
+}
+
+.regDate{
+	display: inline-block;
+}
+
+img{
+	display: block;
+}
+</style>
+</head>
+<body>
+	<script src="https://code.jquery.com/jquery-3.6.4.js" integrity="sha256-a9jBBRygX1Bh5lt8GZjXDzyOB+bWve9EiO7tROUtj/E=" crossorigin="anonymous"></script>
+	<script th:inline="javascript">
+	
+		$(document).ready(function(){
+		var content = [[${cookDetailViewDTO.cookBoard.content}]];
+		console.log(content);
+		$('.content').html(content);
+		});
+		
+		function commentSend(){
+			var bannCheck = [[${member.memBanned}]]
+			var bannDate = [[${#temporals.format(member.bannDate,'yyyy-MM-dd HH:mm:ss')}]]
+			console.log(bannCheck);
+			if(bannCheck=='Y'){
+				alert('차단당하셨습니당. 차단기간은 ['+bannDate+'] 까지입니당')
+			}else{	
+				var comment = $('#commentInput').val()
+				console.log(typeof comment);
+				var writingId =  [[${cookDetailViewDTO.cookBoard.writingId}]];
+				var url = "/CookCommentWriting/"+writingId
+				$.ajax({
+					url : url,
+					type : 'POST',
+					data : {
+						comment : comment
+					},
+					success : function(result){
+						location.href='/CookBoardDetail?writingId='+writingId
+					},
+					error : function(){
+						alert('error')
+					}
+					
+				})	
+			}
+			
+		}
+		
+		function recomFunc(){
+			var writingId =  [[${cookDetailViewDTO.cookBoard.writingId}]];
+			var recomCount = $('.recomCount').val();
+			recomCount = Number(recomCount);
+			var plusCount = recomCount+1;
+			
+			var url = '/doCookRecom/'+writingId;
+			$.ajax({
+				url : url,
+				type : 'POST',
+				success : function(result){
+					if(result=="true"){
+						console.log(result);
+						$('.recomCount').val(plusCount);
+						$('.recomCount').text('추천수 : '+plusCount);
+					}else if(result="false"){
+						alert('이미 추천한 게시글입니다.')
+					}
+				},
+				error : function(){
+					alert('error');
+				}
+			});
+			
+		}
+		
+		function reComment(t){
+			$('#commentButton').attr('onclick','commentResend()')
+			$('#commentButton').text('댓글수정')
+			var commentId = $('#'+t).val()
+			$('#commentButton').val(commentId);
+			var past = $('.'+t+'content').text();
+			$('#commentInput').val(past);
+		}
+		
+		function commentResend(){
+			var bannCheck = [[${member.memBanned}]]
+			var bannDate = [[${#temporals.format(member.bannDate,'yyyy-MM-dd HH:mm:ss')}]]
+			console.log(bannCheck);
+			if(bannCheck=='Y'){
+				alert('차단당하셨습니당. 차단기간은 ['+bannDate+'] 까지입니당')
+			}else{	
+				var writingId =  [[${cookDetailViewDTO.cookBoard.writingId}]];
+				var commentId = $('#commentButton').val();
+				var url = "/CookCommentReWriting/"+commentId;
+				var content = $('#commentInput').val();
+				console.log(commentId);
+				console.log(content);
+				$.ajax({
+					url : url,
+					type : 'POST',
+					data : {
+						content : content
+					},
+					success : function(result){
+						location.href='/CookBoardDetail?writingId='+writingId;
+					},
+					error : function(){
+						alert('error')
+					}
+				})
+			}
+		}
+		
+		function enter(){
+
+			if(event.keyCode==13){
+				
+				if($('#commentButton').attr('onclick')=='commentSend()'){
+					commentSend();	
+				}else if($('#commentButton').attr('onclick')=='commentResend()'){
+					commentResend();
+				}
+			
+			}
+		}
+		
+		function delFunc(t){
+			var writingId =  [[${cookDetailViewDTO.cookBoard.writingId}]];
+			var commentId = $('#'+t).val();
+			var url = "/CookCommentDelete/"+commentId;
+			$.ajax({
+				url : url,
+				type : 'POST',
+				success : function(result){
+					$('#'+t).parent().parent().remove();
+				},
+				error : function(){
+					alert('error');
+				}
+			})
+			
+		}
+		
+		function notifyingMain(){
+			
+			var title = [[${cookDetailViewDTO.cookBoard.title}]];
+			var contentAll = $('p').length;
+			var allContent='';
+			for(var i=0; i<contentAll; i++){
+				var content = $('p').eq(i).text()+' ';
+				allContent+=content;
+			}
+			var writingId = [[${cookDetailViewDTO.cookBoard.writingId}]];
+			var memMail = [[${cookDetailViewDTO.cookBoard.member.memMail}]];
+			var memNick = [[${cookDetailViewDTO.cookBoard.member.memNick}]];
+			var boardId = [[${board.boardId}]];
+			window.open('','notifyingPopUp',"toolbar=no,directories=no,scrollbars=no,resizable=no,status=no,menubar=no,width=500, height=500, top=0,left=20")
+			$('#notifiedTitle').val(title);
+			$('#notifiedContent').val(allContent);
+			$('#notifiedWritingId').val(writingId);
+			$('#notifiedCommentId').val('');
+			$('#notifiedMemMail').val(memMail);
+			$('#notifiedMemNick').val(memNick);
+			$('#notifiedBoardId').val(boardId);
+			$('#notifying').submit();
+		}
+		
+		function notifyingComment(t){
+			
+			var content = $('.'+t+'content').text();
+			var writingId = [[${cookDetailViewDTO.cookBoard.writingId}]];
+			var commentId = $('#'+t).val();
+			var memMail = $('.'+t+'memMail').val();
+			var memNick = $('.'+t+'memNick').text();
+			var boardId = [[${board.boardId}]];
+			console.log(commentId)
+			window.open('','notifyingPopUp',"toolbar=no,directories=no,scrollbars=no,resizable=no,status=no,menubar=no,width=500, height=500, top=0,left=20")
+			$('#notifiedTitle').val('');
+			$('#notifiedContent').val(content);
+			$('#notifiedWritingId').val(writingId);
+			$('#notifiedCommentId').val(commentId);
+			$('#notifiedMemMail').val(memMail);
+			$('#notifiedMemNick').val(memNick);
+			$('#notifiedBoardId').val(boardId);
+			$('#notifying').submit();
+		}
+		
+	</script>
+	<div th:if="${cookDetailViewDTO.cookBoard.delCheck.toString()}=='Y'">
+		삭제된 게시물입니다.
+	</div>
+	<div th:if="${cookDetailViewDTO.cookBoard.delCheck.toString()}!='Y'">
+		<button type="button" onclick="recomFunc()">추천입니당</button>
+		<button type="button" onclick="notifyingMain()">신고라능</button>
+		<button type="button" th:if="${cookDetailViewDTO.cookBoard.member.memId}==${member.memId}" th:onclick="|location.href='@{/CookBoardDetail/rewrite(writingId=${cookDetailViewDTO.cookBoard.writingId})}'|">수정</button>
+		<button type="button" th:if="${cookDetailViewDTO.cookBoard.member.memId}==${member.memId}" th:onclick="|location.href='@{/CookBoardDetail/delete(writingId=${cookDetailViewDTO.cookBoard.writingId})}'|">삭제</button>
+		
+		<div class="boardHeader">
+		<div th:text="${cookDetailViewDTO.cookBoard.title}"></div>
+		<div class="nick" th:text="${cookDetailViewDTO.cookBoard.member.memNick}"></div>
+		<div class="seenCount" th:text="'조회수 : '+${cookDetailViewDTO.cookBoard.seenCount}"></div>
+		<div class="recomCount" th:text="'추천수 : '+${cookDetailViewDTO.cookBoard.recomCount}" th:value="${cookDetailViewDTO.cookBoard.recomCount}"></div>
+		<div class="regDate" th:text="${#temporals.format(cookDetailViewDTO.cookBoard.regDate,'yyyy-MM-dd HH:mm')}"></div>
+		</div>
+		
+		<div class="contentBox">
+		<div class="content"></div>
+		</div>
+		
+		<div class="commentBox">
+		<table>
+		<tr th:each="comment,i : ${cookDetailViewDTO.cookComment}">
+			<td th:text="${comment.member.memNick}" th:class="'comment'+${i.count}+memNick"></td>
+			<td th:text="${comment.content}" th:class="'comment'+${i.count}+content"></td>
+			<td th:text="${#temporals.format(comment.regDate,'yyyy-MM-dd HH:mm')}"></td>
+			<td th:if="${comment.member.memId}==${member.memId}"><button type="button" onclick="reComment(this.value)" th:value="'comment'+${i.count}">수정</button></td>
+			<td th:if="${comment.member.memId}==${member.memId}"><button type="button" onclick="delFunc(this.value)" th:value="'comment'+${i.count}">X</button></td>
+			<td><button type="button" onclick="notifyingComment(this.value)" th:value="'comment'+${i.count}">신고</button></td>
+			<td style="display: none;"><input type="hidden" th:value="${comment.commentId}" th:id="'comment'+${i.count}"></td>
+			<td style="display: none;"><input type="hidden" th:value="${comment.member.memMail}" th:class="'comment'+${i.count}+'memMail'"></td>
+		</tr>
+		</table>
+		</div>
+		
+		
+			<input type="text" id="commentInput" name="content" onkeypress="enter()"/>
+			<button type="button" id="commentButton" onclick="commentSend()">댓글 입력</button>
+			
+		<form th:action="@{/Notifying}" method="post" th:object="${notifyingDTO}" target="notifyingPopUp" id="notifying" style="display: none;">
+			<input type="hidden" name="title" id="notifiedTitle">
+			<input type="hidden" name="content" id="notifiedContent">
+			<input type="hidden" name="writingId" id="notifiedWritingId">
+			<input type="hidden" name="commentId" id="notifiedCommentId">
+			<input type="hidden" name="memMail" id="notifiedMemMail">
+			<input type="hidden" name="memNick" id="notifiedMemNick">
+			<input type="hidden" name="boardId" id="notifiedBoardId">
+		</form>
+
+	</div>	
+		
+	
+</body>
+</html>

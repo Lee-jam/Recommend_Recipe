@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Insert title here</title>
+    <style>
+	img{
+		width: 50px;
+		height: 50px;
+		margin-bottom: 10px
+	}
+	.img{
+		display: inline-block;
+	}
+</style>
+</head>
+<body>
+<script src="https://code.jquery.com/jquery-3.6.4.js" integrity="sha256-a9jBBRygX1Bh5lt8GZjXDzyOB+bWve9EiO7tROUtj/E=" crossorigin="anonymous"></script>
+<Script>
+
+    function changeVal(){
+            var checkBox = document.getElementById("notice");
+            var notice = document.getElementById("noticeCheck");
+            console.log(checkBox.checked);
+            notice.value="Y";
+        if(!checkBox.checked){
+        	notice.value="N";
+        }
+            console.log(notice);
+    }
+
+    function plus(){
+    	var count = document.getElementById("contents").childElementCount+document.getElementById("plusContents").childElementCount+1;
+    	var contents = document.getElementById("plusContents")
+    	console.log(contents)
+        var plusContent = document.createElement("div")
+        plusContent.className='content';
+        contents.appendChild(plusContent)
+        plusContent.innerHTML=`<span>step.${count}  </span><textarea id="content${count}" name="recipeContent"></textarea><input type="file" name="recipeImages"/>`
+    }
+
+    function del(){
+    	if($('#plusContents').children().length==0 && $('#contents').children().length>1){
+    		$('#contents').children(':last').remove();
+    	}else{
+    		$('#plusContents').children(':last').remove();
+    	}
+    }
+
+    function deleteThis(t){
+    	console.log(t);
+    	$('[value='+t+']').attr('src','/images/images/nonImage.png');
+    }
+
+    $(document).ready(function(){
+
+    })
+
+    function checkContent(){
+    	var contents = $('[name=recipeContent]').length
+    	console.log(contents)
+    	for(var i=0; i<contents; i++){
+    		if($('[name=recipeContent]').eq(i).val()==''){
+    			$('[name=recipeContent]').eq(i).val(' ')
+    		}
+    	}
+    	$('#form').submit();
+    }
+
+    function changeImage(t){
+    	$('.'+t).remove();
+    	$('[value='+t+']').remove();
+    	$('.'+t+'delcheck').val('Y');
+    	var num = t.split('imgcon')[1];
+    	console.log(num)
+    	$('#con'+num).append('<input type="file" name="recipeImages"/>');
+    }
+
+
+
+    </Script>
+<form th:action="@{/doRecipeReWrite}" th:object="${writeFormDto}" method="post" enctype="multipart/form-data" id="form">
+
+    <div>
+        <span th:if="${member.memRole.toString()=='Admin'}">공지<input type="checkbox" id="notice" onclick="changeVal()"></span>
+        <span th:if="${member.memRole.toString()=='User'}">공지못쓰지롱</span> <!-- 나중에 지워주십쇼 -->
+    </div>
+    <div>
+        <span>제목<input type="text" name="title" placeholder="제목" th:value="${rewriteDTO.recipeBoard.title}"/></span>
+    </div>
+    <div>
+        <span>난이도</span>
+        <select name="difficulty">
+            <option value="상" th:selected="${rewriteDTO.recipeBoard.difficulty.toString()}==상">상</option>
+            <option value="중" th:selected="${rewriteDTO.recipeBoard.difficulty.toString()}==중">중</option>
+            <option value="하" th:selected="${rewriteDTO.recipeBoard.difficulty.toString()}==하">하</option>
+        </select>
+    </div>
+    <div>
+        <span>칼로리</span><span><input type="text" name="kcal" placeholder="0" th:value="${rewriteDTO.recipeBoard.kcal}"/></span>
+    </div>
+    <div>
+        <span>내용</span>
+    </div>
+    <div class="contents" id="contents">
+        <div class="content" th:each="recipeContent,i : ${rewriteDTO.recipeContents}">
+            <div th:id="'con'+${i.count}"><span th:text="'step.'+${i.count}+' '"></span><textarea th:id="'content'+${i.count}" name="recipeContent">[[${recipeContent.content}]]</textarea>
+                <img th:if="${recipeContent.url.toString}!=''" th:src="${recipeContent.url}" th:class="'imgcon'+${i.count}">
+                <button type="button" th:if="${recipeContent.url.toString}!=''" onclick="changeImage(this.value)" th:value="'imgcon'+${i.count}">X</button>
+                <input type="hidden" th:class="'imgcon'+${i.count}+delcheck" name="imgdelCheck" value="N">
+                <input type="file" th:if="${recipeContent.url.toString}!=''" style="display: none" th:class="'imgcon'+${i.count}" name="recipeImages">
+                <input type="file" th:if="${recipeContent.url.toString}==''" name="recipeImages"/></div>
+        </div>
+    </div>
+    <div id="plusContents">
+    </div>
+
+    <div><label>레시피 내용 추가</label><button type="button" onclick="plus()">+</button><label>레시피 내용 삭제</label><button type="button" onclick="del()">-</button></div>
+
+
+
+
+    <input type="button" value="갑시당" onclick="checkContent()">
+    <input type="hidden" id="noticeCheck" name="noticeCheck" value="N"/>
+    <input type="hidden" name="writingId" th:value="${rewriteDTO.recipeBoard.writingId}">
+
+</form>
+
+
+</body>
+</html>

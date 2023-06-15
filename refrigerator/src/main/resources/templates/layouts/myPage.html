@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th=http://www.thymeleaf.org
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+  <meta charset="UTF-8">
+  <link th:href="@{/css/mypage.css}" type="text/css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=Inter:wght@200&display=swap" rel="stylesheet">
+
+  <title>Title</title>
+
+</head>
+<body class="body">
+<div class="mypage">
+  <div th:replace="fragments/lnb::navi"></div>
+  <div layout:fragment="content"></div>
+</div>
+<script th:src="@{/js/mypage.js}" type="text/javascript"></script>
+</body>
+</html>

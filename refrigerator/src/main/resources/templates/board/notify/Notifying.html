@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<style>
+[readonly=readonly]{
+	color: gray;
+}
+</style>
+<script src="https://code.jquery.com/jquery-3.6.4.js" integrity="sha256-a9jBBRygX1Bh5lt8GZjXDzyOB+bWve9EiO7tROUtj/E=" crossorigin="anonymous"></script>
+<script th:inline="javascript">
+
+function send(){
+	var member = $('#member').val();
+	var title = $('#title').val();
+	var content = $('#content').val();
+	var why = $('[name=why]:checked').val();
+	var reason = $('#reason').val();
+	var writingId = $('#writingId').val();
+	var commentId = $('#commentId').val();
+	var boardId = $('#boardId').val();
+	var url = '/doNotifying';
+	$.ajax({
+		url : url,
+		type : 'POST',
+		data : {
+			member : member,
+			title : title,
+			content : content,
+			why : why,
+			reason : reason,
+			writingId : writingId,
+			commentId : commentId,
+			boardId : boardId
+		},
+		success : function(result){
+			alert('success')
+			window.close();
+		},
+		error : function(){
+			alert('error')
+		}
+	})
+}
+
+</script>
+
+<body>
+
+	<div><label>신고 대상 : </label><input type="text" th:value="${notifyingDTO.memNick}+'('+${notifyingDTO.memMail}+')'" id ="member" readonly="readonly"/></div>
+	
+	<div th:if="${notifyingDTO.title}!=''"><label>신고 제목 : </label><input type="text" th:value="${notifyingDTO.title}" id="title" readonly="readonly"/></div>
+	<div th:if="${notifyingDTO.title}==''"><input type="hidden" th:value="${notifyingDTO.title}" id="title"></div>
+	
+	<div><label>신고 내용 : </label><input type="text" th:value="${notifyingDTO.content}" id="content" readonly="readonly"/></div>
+	
+	<div>
+	<label>신고 사유 : </label>
+	<label>욕설</label><input type="radio" name="why" value="욕설" checked="checked">
+	<label>음란물</label><input type="radio" name="why"  value="음란물">
+	<label>무단광고</label><input type="radio" name="why"  value="무단광고">
+	<label>기타</label><input type="radio" name="why" value="기타">
+	</div>
+	
+	<div><label>상세 신고 사유 : </label></div>
+	<div><textarea placeholder="상세 신고 사유를 적어주세요" id="reason"></textarea></div>
+	
+	<input type="hidden" th:value="${notifyingDTO.writingId}" id="writingId">
+	<input type="hidden" th:value="${notifyingDTO.commentId}" id="commentId">
+	<input type="hidden" th:value="${notifyingDTO.boardId}" id="boardId">
+	
+	<button type="button" onclick="send()">전송</button>
+
+
+</body>
+</html>

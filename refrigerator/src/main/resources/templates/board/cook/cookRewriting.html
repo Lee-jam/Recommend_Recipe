@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script src="https://code.jquery.com/jquery-3.6.4.js" integrity="sha256-a9jBBRygX1Bh5lt8GZjXDzyOB+bWve9EiO7tROUtj/E=" crossorigin="anonymous"></script>
+<link href="https://cdn.jsdelivr.net/npm/suneditor@latest/dist/css/suneditor.min.css" rel="stylesheet">
+<!-- <link href="https://cdn.jsdelivr.net/npm/suneditor@latest/assets/css/suneditor.css" rel="stylesheet"> -->
+<!-- <link href="https://cdn.jsdelivr.net/npm/suneditor@latest/assets/css/suneditor-contents.css" rel="stylesheet"> -->
+<script src="https://cdn.jsdelivr.net/npm/suneditor@latest/dist/suneditor.min.js"></script>
+<!-- languages (Basic Language: English/en) -->
+<script src="https://cdn.jsdelivr.net/npm/suneditor@latest/src/lang/ko.js"></script>
+<script th:inline="javascript">
+
+
+$(function(){
+    SUNEDITOR.create('content',{
+      font : [
+          'Arial',
+          'tahoma',
+          'Courier New,Courier'
+      ],
+      fontSize : [
+          8, 10, 14, 18, 24, 36, 48, 60
+      ],
+      colorList: [
+          ['#ccc', '#dedede', 'OrangeRed', 'Orange', 'RoyalBlue', 'SaddleBrown'],
+          ['SlateGray', 'BurlyWood', 'DeepPink', 'FireBrick', 'Gold', 'SeaGreen']
+      ],
+      width: '100%',
+      maxWidth: '730px',
+      minWidth: 730,
+      height : 'auto',
+      imageWidth : 150,
+      popupDisplay: 'local',
+      resizingBar: false,
+      buttonList : [
+          ['font', 'fontSize'],
+          ['bold', 'underline', 'italic', 'strike'],
+          ['fontColor', 'hiliteColor'],
+          ['outdent', 'indent'],
+          ['align', 'horizontalRule', 'list', 'lineHeight'],
+          ['table' ]
+      ],
+      imageFileInput : true,
+      callBackSave: function (contents) {
+          alert(contents);
+      }
+    });
+  });
+  
+$(document).ready(function(){
+	var content = /*[[${cookWritingDTO.content}]]*/'';
+	console.log(content);
+	$('.sun-editor-editable').html(content);
+	for(var i=0; i<$('img').length; i++){
+		var contentName = $('img').eq(i).attr('src');
+		var contentName = contentName.slice(16)
+		var className = $('img').eq(i).attr('class');
+		className = className.slice(0,9)
+		if(i==0){
+		var rest = '<div class="'+className+' pastRep"><div class="content-inline">'+contentName+'</div><button type="button" value="'+className+'" onclick="delFunc(this.value)" class="content-inline">x</button></div>';			
+		}else{
+		var rest = '<div class="'+className+'"><div class="content-inline">'+contentName+'</div><button type="button" value="'+className+'" onclick="delFunc(this.value)" class="content-inline">x</button></div>';		
+		}
+		console.log(className)
+		$('.inputFileContainer').append(rest);
+		if($('.inputFileContainer').children(0)==$('#image1')){
+			console.log('check');
+		}
+	}
+	
+});
+  
+function changeVal(){
+    var checkBox = document.getElementById("notice");
+    var notice = document.getElementById("noticeCheck");
+    console.log(checkBox.checked);
+    notice.value="Y";
+if(!checkBox.checked){
+	notice.value="N";
+}
+    console.log(notice);
+	
+}
+
+	var count = 2;
+function sendImage(){
+	console.log($('img').length)
+	if($('img').length!==0){		
+		var imgClass = Number($('img:last').attr('class').slice(8,9));
+		var imgcount = imgClass;
+	}else{
+		var imgcount = 0;
+	}
+	console.log(imgClass);
+	var input = `<input type="file" id="image${count}" name="images" onchange="sendImage()">`;
+	var fileInput = $('#image'+`${count-1}`)[0];
+	var file = fileInput.files[0];
+	var fileName = file.name;
+	var inputFileName = `<div class="imgCount${imgcount+1} content-block"><div class="content-inline">${fileName}</div><button type="button" value="imgCount${imgcount+1}" onclick="delFunc(this.value)" class="content-inline">x</button></div>`;
+	console.log(file);
+	var formData = new FormData();
+	formData.append('image',file);
+	formData.append('count',count-1);
+	var url = "/doCookImageSet"
+	
+	$.ajax({
+		
+		url : url,
+		type : 'POST',
+		enctype:'multipart/form-data',
+		contentType : false,
+        processData : false, 
+		data : formData,
+		success : function(result){
+			var imageUrl = result;
+			var img = '<img src='+result+` style="width:200px; height:200px" class="imgCount${imgcount+1} images">`
+			$('.sun-editor-editable').append(img);
+			
+		},
+		error : function(){
+			alert('error')
+		}
+		
+	})
+
+	
+	$('.inputFileContainer').append(inputFileName);
+	$('.inputFileContainer').append(input);
+	$('#image'+`${count-1}`).css('display','none');
+	count++;
+}
+
+function addContent(){
+	var value = $('.sun-editor-editable').html();
+	var content = $('#contents').val(value);
+	if($('.pastRep').length==0){
+		var newRep = $('img:first').attr('src');
+		$('[name=repUrl]').val(newRep);
+	}
+	console.log(content);
+}
+
+
+function delFunc(t){
+	var imgContent = $('.'+t)
+	var imgContent2 = $('img.'+t)
+	var imgParent = imgContent2.parent().parent();
+	var button = $('[value='+t+']')
+	imgContent.remove();
+	if($('.se-image-container').length>0){
+	imgParent.remove();
+	}
+	button.remove();
+}
+
+
+</script>
+
+<style>
+	[type=file]{
+		display: block;
+	}
+	.content-inline{
+		display: inline-block;
+	}
+	.content-block{
+		display: block;
+	}
+</style>
+
+</head>
+<body>
+<form th:action="@{'/doCookreWriting/'+${writingId}}" method="post" enctype="multipart/form-data" th:object="${cookWritingDTO}">
+<div>
+            	<span th:if="${member.memRole.toString()=='User'}">공지<input type="checkbox" id="notice" onclick="changeVal()"></span>
+            	<span th:if="${member.memRole.toString()=='User'}">공지못쓰지롱</span> <!-- 나중에 지워주십쇼 -->
+</div>
+<div>
+<input type="text" id="title" name ="title" placeholder="제목을 입력해주세요" th:value="${cookWritingDTO.title}">
+</div>
+<textarea rows="30px" cols="100px" id="content"></textarea>
+<div class="inputFileContainer">
+	<input type="file" id="image1" name="images" onchange="sendImage()">
+</div>
+<div>
+<button type="submit" onclick="addContent()">글 수정</button>
+
+</div>
+<input type="hidden" id="noticeCheck" name="noticeCheck" value="N"/>
+<input type="hidden" id="contents" name="content"/>
+<input type="hidden" name="repUrl">
+</form>
+
+
+</body>
+</html>

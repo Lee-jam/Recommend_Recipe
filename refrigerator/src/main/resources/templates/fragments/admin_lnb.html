@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+    <div  th:fragment="navi" class="flexMode admin_Lnb">
+        <div style="flex-grow: 1; margin-top: 55px;">이미지~~</div>
+        <a href="#" style="flex-grow: 1;">Admin-대시보드</a>
+        <div style="flex-grow: 1;">
+            <a href="#">사용자 관리</a>
+            <ul class="user_Management">
+                <li><a href="">정보 관리</a></li>
+                <li><a href="">신고 관리</a></li>
+            </ul>
+        </div>
+        <div style="flex-grow: 6;">
+            <a href="#">보드 관리</a>
+            <ul class="board_Management">
+                <li><a href="">공지</a></li>
+                <li><a href="">휴지통</a></li>
+            </ul>
+        </div>
+    </div>
+
+</html>

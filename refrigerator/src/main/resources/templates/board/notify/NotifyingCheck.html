@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script src="https://code.jquery.com/jquery-3.6.4.js" integrity="sha256-a9jBBRygX1Bh5lt8GZjXDzyOB+bWve9EiO7tROUtj/E=" crossorigin="anonymous"></script>
+<script th:inline="javascript">
+function bannedAndDelete(){
+	var notifiedMember=[[${notifyingCheckDTO.notifiedMember}]];
+	var writingId =[[${notifyingCheckDTO.writingId}]];
+	var commentId = [[${notifyingCheckDTO.commentId}]];
+	var boardId = [[${notifyingCheckDTO.boardId}]];
+	var memMail = notifiedMember.split('(')[1];
+	var selectDate = $('select option:selected').text();
+	memMail = memMail.split(')')[0];
+	console.log(writingId);
+	console.log(commentId);
+	
+	if(confirm("해당 회원 차단 및 글 삭제를 진행하시겠습니까?")){
+		if(commentId==null){
+			var url = '/MemBannAndContentDel'
+			$.ajax({
+				url : url,
+				type : 'POST',
+				data : {
+					memMail : memMail,
+					writingId : writingId,
+					boardId : boardId,
+					selectDate : selectDate
+				},
+				success : function(result){
+					window.close();
+				},
+				error : function(){
+					alert('error');
+				}
+			})
+		}else{
+			var url = '/MemBannAndCommentDel'
+				$.ajax({
+					url : url,
+					type : 'POST',
+					data : {
+						memMail : memMail,
+						commentId : commentId,
+						boardId : boardId,
+						selectDate : selectDate
+					},
+					success : function(result){
+						window.close();
+					},
+					error : function(){
+						alert('error');
+					}
+				})
+		}
+	}else{
+		alert('취소되었습니다.')
+		window.close();
+	}
+}
+</script>
+<style>
+[readonly=readonly]{
+	color: gray;
+}
+</style>
+</head>
+<body>
+	<label>신고자 : </label>
+	<div>
+	<input th:value="${notifyingCheckDTO.member}" readonly="readonly">
+	</div>
+	<label>피신고자 : </label>
+	<div>
+	<input th:value="${notifyingCheckDTO.notifiedMember}" readonly="readonly">
+	</div>
+	<label>제목 : </label>
+	<div>
+	<input th:value="${notifyingCheckDTO.title}" readonly="readonly">
+	</div>
+	<label>내용 : </label>
+	<div>
+	<textarea th:text="${notifyingCheckDTO.content}" readonly="readonly"></textarea>
+	</div>
+	<label>신고 유형 :</label>
+	<div>
+	<input type="radio" th:checked="${notifyingCheckDTO.notifiedCase.toString()}=='욕설'" th:disabled="${notifyingCheckDTO.notifiedCase.toString()}!='욕설'">욕설
+	<input type="radio" th:checked="${notifyingCheckDTO.notifiedCase.toString()}=='음란물'" th:disabled="${notifyingCheckDTO.notifiedCase.toString()}!='음란물'">음란물
+	<input type="radio" th:checked="${notifyingCheckDTO.notifiedCase.toString()}=='무단광고'" th:disabled="${notifyingCheckDTO.notifiedCase.toString()}!='무단광고'">무단광고
+	<input type="radio" th:checked="${notifyingCheckDTO.notifiedCase.toString()}=='기타'" th:disabled="${notifyingCheckDTO.notifiedCase.toString()}!='기타'">기타
+	</div>
+	<label>상세 신고 이유 :</label>
+	<div>
+	<textarea th:text="${notifyingCheckDTO.notifiedReason}" readonly="readonly"></textarea>
+	</div>
+	<div>
+	<label>차단기간 설정</label>
+	<select>
+		<option>1일</option>
+		<option>7일</option>
+		<option>30일</option>
+	</select>
+	</div>
+	<button type="button" onclick=" bannedAndDelete()">차단 및 글 삭제</button>
+</body>
+</html>

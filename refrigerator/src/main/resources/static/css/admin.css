@@ -1,0 +1,55 @@
+html, body{
+    height: 100%;
+    margin: 0;
+    
+}
+a{
+    display: block;
+    text-decoration-line: none;
+    color: white;
+}
+ul{
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+li{
+    font-size: large;
+}
+.flexMode{
+    display: flex;
+}
+.adminPage{
+    height: 100%;
+}
+.admin_Lnb{
+    text-align: center;
+    font-size: x-large;
+    color: white;
+    width: 350px;
+    height: 100%;
+    flex-direction: column;
+    background-color: rgba(0, 0, 0, 0.7);
+}
+.admin_Main{
+    background-color: rgba(0, 0, 0, 0.3);
+    width: 100%;
+    flex-direction: column;
+    height: 100%;
+}
+.UpExplanation{
+    border-bottom: 1px solid lightgray;
+    height: 100px;
+    position: relative;
+}
+.UpExplanation>p{
+    position: absolute;
+    margin-left: 10px;
+    bottom: 15px;
+}
+.user_Management{
+
+}
+.board_Management{
+
+}

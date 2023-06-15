@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>Insert title here</title>
+	<style>
+h1{
+	text-align: center;
+}
+
+.totalContainer{
+	width: 1500px;
+}
+
+.buttonContainer{
+	margin-bottom: 20px
+}
+
+.contentContainer{
+	display: inline-block;
+	margin-left: 20px;
+	width: 1200px;
+}
+.recipe{
+	margin-bottom: 20px;
+	width: 1100px;
+}
+.step{
+	display: inline-block;
+	position: relative;
+	bottom: 100px;
+}
+
+.img{
+	display: inline-block;
+}
+.commentsContainer{
+	border:1px solid black;
+	width: 500px;
+	min-height: 300px;
+}
+.image{
+	height: 200px;
+	width: 200px;
+	margin-left: 20px;
+}
+.contents{
+	display: inline-block;
+	border: 1px solid black;
+	height: 200px;
+	width: 700px;
+}
+
+.content{
+	display: inline-block;
+	width : 474px;
+}
+
+.text{
+	position: relative;
+	bottom : 180px;
+	left : 20px;
+	width : 474px;
+	white-space: normal;;
+}
+
+</style>
+</head>
+<body>
+<script src="https://code.jquery.com/jquery-3.6.4.js" integrity="sha256-a9jBBRygX1Bh5lt8GZjXDzyOB+bWve9EiO7tROUtj/E=" crossorigin="anonymous"></script>
+
+<script th:inline="javascript">
+
+	$(document).ready(function(){
+		  /*<![CDATA[*/
+		var ErrorMessage = [[${ErrorMessage}]];
+		console.log(ErrorMessage);
+		if(ErrorMessage!=null){
+		alert(ErrorMessage);
+		location.href="/recipeView?writingId="+[[${detailViewDTO.recipeBoard.writingId}]];
+		}
+
+		var Follow = [[${Following}]];
+		var star = $('#star')
+		console.log(Follow);
+		if(Follow==0){
+			star.attr("src","/images/images/nullstar.png")
+		}else{
+			star.attr("src","/images/images/followstar.png")
+		}
+
+	/*]]>*/
+	});
+
+	function followFunc(){
+		var star = $('#star')
+		var nowStar = $('#star').attr("src")
+		if(nowStar=="/images/images/nullstar.png"){
+		star.attr("src","/images/images/followstar.png")
+		}else{
+			star.attr("src","/images/images/nullstar.png")
+		}
+		var url = '/updateFollow/'+[[${detailViewDTO.recipeBoard.writingId}]]
+		$.ajax({
+			type: 'POST',
+				url : url,
+				success: function(result){
+
+				},
+				error:function(){
+
+				}
+		});
+	}
+
+	function commentSend(){
+		var bannCheck = [[${member.memBanned}]]
+		var bannDate = [[${#temporals.format(member.bannDate,'yyyy-MM-dd HH:mm:ss')}]]
+		console.log(bannCheck);
+		if(bannCheck=='Y'){
+			alert('차단당하셨습니당. 차단기간은 ['+bannDate+'] 까지입니당')
+		}else{
+			var comment = $('#commentInput').val()
+			var writingId =  [[${detailViewDTO.recipeBoard.writingId}]];
+			var url = "/recipeCommentWriting/"+writingId
+			$.ajax({
+				url : url,
+				type : 'POST',
+				data : {
+					comment : comment
+				},
+				success : function(result){
+					location.href='/recipeView?writingId='+writingId
+				},
+				error : function(){
+					alert('error')
+				}
+
+			})
+		}
+	}
+
+	function reComment(t){
+		$('#commentButton').attr('onclick','commentResend()')
+		$('#commentButton').text('댓글수정')
+		var commentId = $('#'+t).val()
+		$('#commentButton').val(commentId);
+		var past = $('.'+t+'content').text();
+		$('#commentInput').val(past);
+	}
+
+	function commentResend(){
+		var bannCheck = [[${member.memBanned}]]
+		var bannDate = [[${#temporals.format(member.bannDate,'yyyy-MM-dd HH:mm:ss')}]]
+		console.log(bannCheck);
+		if(bannCheck=='Y'){
+			alert('차단당하셨습니당. 차단기간은 ['+bannDate+'] 까지입니당')
+		}else{
+			var writingId =  [[${detailViewDTO.recipeBoard.writingId}]];
+			var commentId = $('#commentButton').val();
+			var url = '/recipeCommentResend/'+commentId;
+			var content = $('#commentInput').val();
+			$.ajax({
+				url : url,
+				type : 'POST',
+				data : {
+					content : content
+				},
+				success : function(result){
+					location.href='/recipeView?writingId='+writingId;
+				},
+				error : function(){
+					alert('error')
+				}
+			})
+		}
+	}
+
+	function enter(){
+
+		if(event.keyCode==13){
+
+			if($('#commentButton').attr('onclick')=='commentSend()'){
+				commentSend();
+			}else if($('#commentButton').attr('onclick')=='commentResend()'){
+				commentResend();
+			}
+
+		}
+	}
+
+	function recomFunc(){
+		var writingId =  [[${detailViewDTO.recipeBoard.writingId}]];
+		var recomCount = $('.recomCount').val();
+		recomCount = Number(recomCount);
+		var plusCount = recomCount+1;
+
+		var url = '/updateRecomCount/'+writingId;
+		$.ajax({
+			url : url,
+			type : 'POST',
+			success : function(result){
+				if(result=="true"){
+					console.log(result);
+					$('.recomCount').val(plusCount);
+					$('.recomCount').text('추천수 : '+plusCount);
+				}else if(result="false"){
+					alert('이미 추천한 게시글입니다.')
+				}
+			},
+			error : function(){
+				alert('error');
+			}
+		});
+
+	}
+
+	function delFunc(t){
+		var writingId =  [[${detailViewDTO.recipeBoard.writingId}]];
+		var commentId = $('#'+t).val();
+		var url = "/recipeCommentDelete/"+commentId;
+		$.ajax({
+			url : url,
+			type : 'POST',
+			success : function(result){
+				$('#'+t).parent().parent().remove();
+			},
+			error : function(){
+				alert('error');
+			}
+		})
+
+	}
+
+	function notifyingMain(){
+
+		var title = [[${detailViewDTO.recipeBoard.title}]];
+		var contentAll = $('.content').length;
+		var allContent='';
+		for(var i=0; i<contentAll; i++){
+			var content = $('.content').eq(i).text()+' ';
+			allContent+=content;
+		}
+		var writingId = [[${detailViewDTO.recipeBoard.writingId}]];
+		var memMail = [[${detailViewDTO.recipeBoard.member.memMail}]];
+		var memNick = [[${detailViewDTO.recipeBoard.member.memNick}]];
+		var boardId = [[${board.boardId}]];
+		window.open('','notifyingPopUp',"toolbar=no,directories=no,scrollbars=no,resizable=no,status=no,menubar=no,width=500, height=500, top=0,left=20")
+		$('#notifiedTitle').val(title);
+		$('#notifiedContent').val(allContent);
+		$('#notifiedWritingId').val(writingId);
+		$('#notifiedCommentId').val('');
+		$('#notifiedMemMail').val(memMail);
+		$('#notifiedMemNick').val(memNick);
+		$('#notifiedBoardId').val(boardId);
+		$('#notifying').submit();
+	}
+
+	function notifyingComment(t){
+
+		var content = $('.'+t+'content').text();
+		var writingId = [[${detailViewDTO.recipeBoard.writingId}]];
+		var commentId = $('#'+t).val();
+		var memMail = $('.'+t+'memMail').val();
+		var memNick = $('.'+t+'memNick').text();
+		var boardId = [[${board.boardId}]];
+		console.log(commentId)
+		window.open('','notifyingPopUp',"toolbar=no,directories=no,scrollbars=no,resizable=no,status=no,menubar=no,width=500, height=500, top=0,left=20")
+		$('#notifiedTitle').val('');
+		$('#notifiedContent').val(content);
+		$('#notifiedWritingId').val(writingId);
+		$('#notifiedCommentId').val(commentId);
+		$('#notifiedMemMail').val(memMail);
+		$('#notifiedMemNick').val(memNick);
+		$('#notifiedBoardId').val(boardId);
+		$('#notifying').submit();
+	}
+
+</script>
+<div th:if="${detailViewDTO.recipeBoard.delcheck.toString()}=='Y'">
+	삭제된 게시물입니다.
+</div>
+<div th:if="${detailViewDTO.recipeBoard.delcheck.toString()}!='Y'">
+	<h1 th:text="${detailViewDTO.recipeBoard.title}"></h1>
+	<div th:text="'조회수 : '+${detailViewDTO.recipeBoard.seenCount}"></div>
+	<div th:text="'추천수 : '+${detailViewDTO.recipeBoard.recomCount}" th:value="${detailViewDTO.recipeBoard.recomCount}" class="recomCount"></div>
+
+	<div class="totalContainer">
+		<div class="buttonContainer">
+			<img src="/images/images/nullstar.png" onclick="followFunc()" width="20px" height="20px" id="star">즐겨찾기
+			<button type="button" onclick="recomFunc()">추천이라능</button>
+			<button type="button" onclick="notifyingMain()">신고라능</button>
+			<button type="button" th:if="${detailViewDTO.recipeBoard.member.memId}==${member.memId}" th:onclick="|location.href='@{recipeView/rewrite(writingId=${detailViewDTO.recipeBoard.writingId})}'|">수정</button>
+			<button type="button" th:if="${detailViewDTO.recipeBoard.member.memId}==${member.memId}" th:onclick="|location.href='@{/recipeView/delete(writingId=${detailViewDTO.recipeBoard.writingId})}'|">삭제</button>
+		</div>
+		<div class="contentContainer">
+			<div th:each="recipeContent, i : ${detailViewDTO.recipeContents}" class="recipe">
+				<div class="step" th:text="'step'+${i.count}"></div>
+				<div class="contents">
+					<div class="content">
+						<div th:text="${recipeContent.content}" class="text"></div>
+					</div>
+					<div class="img"><img th:src="${recipeContent.url}" class="image" onerror="this.src='/images/images/nonImage.png'"></div>
+				</div>
+			</div>
+		</div>
+
+		<div class="commentsContainer">
+			<table>
+				<tr th:each="recipeComment,i : ${detailViewDTO.recipeComments}">
+					<td th:text="${recipeComment.member.memNick}" th:class="'comment'+${i.count}+'memNick'"></td>
+					<td th:text="${recipeComment.content}" th:class="'comment'+${i.count}+'content'"></td>
+					<td th:text="${#temporals.format(recipeComment.regDate,'yyyy-MM-dd HH:mm')}"></td>
+					<td th:if="${member.memId}==${recipeComment.member.memId}">
+					<td th:if="${recipeComment.member.memId}==${member.memId}"><button type="button" onclick="reComment(this.value)" th:value="'comment'+${i.count}">수정</button></td>
+					<td th:if="${recipeComment.member.memId}==${member.memId}"><button type="button" onclick="delFunc(this.value)" th:value="'comment'+${i.count}">삭제</button></td>
+					<td><button type="button" onclick="notifyingComment(this.value)" th:value="'comment'+${i.count}">신고</button></td>
+					<td style="display: none;"><input type="hidden" th:value="${recipeComment.commentId}" th:id="'comment'+${i.count}"></td>
+					<td style="display: none;"><input type="hidden" th:value="${recipeComment.member.memMail}" th:class="'comment'+${i.count}+'memMail'"></td>
+				</tr>
+			</table>
+		</div>
+
+		<input type="text" id="commentInput" name="content" onkeypress="enter()"/>
+		<button type="button" id="commentButton" onclick="commentSend()">댓글 입력</button>
+	</div>
+
+	<form th:action="@{/Notifying}" method="post" th:object="${notifyingDTO}" target="notifyingPopUp" id="notifying" style="display: none;">
+		<input type="hidden" name="title" id="notifiedTitle">
+		<input type="hidden" name="content" id="notifiedContent">
+		<input type="hidden" name="writingId" id="notifiedWritingId">
+		<input type="hidden" name="commentId" id="notifiedCommentId">
+		<input type="hidden" name="memMail" id="notifiedMemMail">
+		<input type="hidden" name="memNick" id="notifiedMemNick">
+		<input type="hidden" name="boardId" id="notifiedBoardId">
+	</form>
+</div>
+</body>
+</html>
