@@ -7,16 +7,41 @@
 <div layout:fragment="content" style="width:200vw" id="main_outline">
     <div class="main_set">
         <div class="main_position">
-        <div class="inter sub_sentence">하루 종일 고민했는데 또 고민?!<br>
+            <div class="inter sub_sentence">하루 종일 고민했는데 또 고민?!<br>
              고민은 이제 그만!</div>
-        <div class="doHyeon main_sentence">오늘 먹을 <span class="emphasis">요리 레시피</span>를<br> 추천해드립니다.</div>
-        <button type="button" id="call_bard" class="inter ai_btn">Cooking</button>
+            <div class="doHyeon main_sentence">오늘 먹을 <span class="emphasis">요리 레시피</span>를<br> 추천해드립니다.</div>
+            <button type="button" id="call_bard" class="inter ai_btn">Cooking</button>
         </div>
         <button class ="movebtn moveToRcp1"><span>&rang;</span></button>
     </div>
     <div class="main_set">
         <button class ="movebtn moveToRcp2"><span>&lang;</span></button>
-        <div><p id="radn_recipe"></p></div>
+        <div class="main_position2">
+            <div class="recipeBoard">
+                <div class="recipeContent">
+                    <form action="board/randomRecipeSave" method="post" style="margin:0 6%;">
+                        <input id="cookName" class="cookName" value="요리이름" readonly/>
+                        <h4>재료</h4>
+                        <input id="cookIngredient" type="hidden" value="재료" readonly/>
+                        <pre id="cookIngredientContent"></pre>
+                        <h4>난이도</h4>
+                        <input id="cookLevel" type="hidden" value="상/중/하" readonly/>
+                        <pre id="cookLevelContent"></pre>
+                        <h4>요리순서</h4>
+                        <input id="cookOrder" type="hidden" value="요리순서" readonly/>
+                        <pre id="cookOrderContent"></pre>
+                        <h4>팁</h4>
+                        <input id="cookTip" type="hidden" value="팁" readonly/>
+                        <pre id="cookTipContent"></pre>
+                        <div>
+                            <button type="button">재추천</button><button>저장</button>
+                        </div>
+                    </form>
+                </div>
+<!--                <p id="radn_recipe"></p>-->
+            </div>
+
+        </div>
     </div>
 </div>
 
@@ -29,10 +54,19 @@
     const mask = document.getElementById("mask");
     mask.style.display = "flex";
         $.ajax({
-            type:'POST',
-            url:'<RandomRecipeAPI URL>',
+            type:'GET',
+            url:'/random',
             success: function(data){
-                $('#radn_recipe').text(data);
+                $('#cookName').val(data.cook_title);
+<!--                $('#cookIngredient').val(data.cook_ingredient);-->
+<!--                $('#cookLevel').val(data.cook_level);-->
+<!--                $('#cookOrder').val(data.cook_method);-->
+<!--                $('#cookTip').val(data.cook_tip);-->
+                $('#cookIngredientContent').html(data.cook_ingredient);
+                $('#cookLevelContent').html(data.cook_level);
+                $('#cookOrderContent').html(data.cook_method);
+                $('#cookTipContent').html(data.cook_tip);
+
                 $('#radn_recipe').css('display','block');
                 $('.moveToRcp2').css('display','block');
                 $('#main_outline').css({"transition":"0.5s ease-in","transform":"translateX(-100vw)"});

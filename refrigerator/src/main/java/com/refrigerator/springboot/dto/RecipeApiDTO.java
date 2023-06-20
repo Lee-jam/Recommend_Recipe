@@ -6,10 +6,10 @@ import lombok.Data;
 @Data
 @Builder
 public class RecipeApiDTO {
-    private String rep_nm;
-    private String info_eng;
-    private String rcp_part;
-    private String manual;
+    private String rep_nm; //레시피 명
+    private String info_eng; //칼로리
+    private String rcp_part; //재료
+    private String manual; //요리 방법
 
     public RecipeApiDTO(String rep_nm, String info_eng, String rcp_part, String manual){
         this.rep_nm=rep_nm;

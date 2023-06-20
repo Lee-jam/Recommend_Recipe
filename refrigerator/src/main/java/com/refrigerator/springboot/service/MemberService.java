@@ -1,5 +1,6 @@
 package com.refrigerator.springboot.service;
 
+import com.refrigerator.springboot.constant.LoginType;
 import com.refrigerator.springboot.entity.Member;
 import com.refrigerator.springboot.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,10 @@ import javax.transaction.Transactional;
 public class MemberService implements UserDetailsService {
 
     private final MemberRepository memberRepository;
+    private String name;
+    private String email;
+    private String nickname;
+    private LoginType loginType;
 
     public Member saveMember(Member member) {
         validateDuplicateMember(member);
@@ -25,14 +30,15 @@ public class MemberService implements UserDetailsService {
 
     private void validateDuplicateMember(Member member) {
         Member findMember = memberRepository.findByEmail(member.getEmail());
-        if (findMember != null) {
+        LoginType loginType = null;
+        if (findMember != null && loginType == findMember.getLoginType()) {
             throw new IllegalStateException("이미 가입된 회원입니다.");
         }
     }
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Member member = memberRepository.findByEmail(email);
+        Member member = memberRepository.findByEmailAndLoginType(email, LoginType.NOMAL);
         if (member == null) {
             throw new UsernameNotFoundException(email);
         }

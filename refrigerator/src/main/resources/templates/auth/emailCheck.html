@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <meta charset="UTF-8">
+    <meta content="IE=edge" http-equiv="X-UA-Compatible">
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+    <title>EmailAuth</title>
+</head>
+
+<body>
+<div>
+    <input id="email" placeholder="이메일">
+    <button id="sendMailBtn">인증번호 전송</button>
+</div>
+<div>
+    <div>
+        <input id="checkInput" placeholder="인증번호">
+    </div>
+    <div>
+        <button id="confirmBtn">확인</button>
+    </div>
+</div>
+<script>
+        $('#sendMailBtn').click(function () {
+            var token = $("meta[name='_csrf']").attr("content");
+            var header = $("meta[name='_csrf_header']").attr("content");
+            var email = $('#email').val();
+            $.ajax({
+                url: "/member/mailChk",
+                type: "post",
+                data: email,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader(header, token);
+                },
+                success: function (data) {
+                    alert("메일을 보냈습니다.");
+                    console.log("data : " + data);
+                    check(data);
+                }
+            })
+        })
+
+        function check(data) {
+            var checkInput = document.getElementById("checkInput")
+            $('#confirmBtn').click(function () {
+                if (checkInput.value == data) {
+                    alert("일치! 회원가입으로 이동합니다.");
+                    window.location.href = "/member/new";
+                } else {
+                    alert("불일치! 다시 확인해주세요");
+                }
+            })
+        }
+
+
+</script>
+</body>
+
+
+</html>

@@ -24,7 +24,7 @@
                     </tr>
                     <tr th:each="recipeList : ${recipeLists}">
                         <td>
-                            <button id="detailRecipe" class="detailRecipe Sfont" th:text="${recipeList.rep_nm}" th:value="${recipeList}"></button>
+                            <button id="detailRecipe" class="detailRecipe Sfont" th:text="${recipeList.rep_nm}" th:value="${recipeList.rep_nm}"></button>
                         </td>
                         <td class="Sfont"><span>재료</span><span>재료</span></td>
                         <td class="Sfont" style="text-align:center;">02/03</td>
@@ -36,6 +36,26 @@
                 </table>
                 </div>
             </div>
+            <div class="flex_grow1 recipeDetail">
+                <div class="mainTop">
+                    <h3 id="choiceCook"></h3>
+                    <button type="button" class="backbtn"><i class="fas fa-arrow-circle-left fa-3x" style="color: #606060;"></i></button>
+                </div>
+                <div class="recipeTable">
+                    <table>
+                        <tr id="rcp_part">
+                            <th>재료</th>
+                        </tr>
+                        <tr id ="info_eng">
+                            <th>칼로리</th>
+                        </tr>
+                    </table>
+                    <ul class="recipeDetails">
+                        요리 방법
+                    </ul>
+                </div>
+            </div>
+
             <div class="flex_grow1 checkBlog">
                 <div class="mainTop">
                 <h3>블로그 조회</h3>
@@ -121,14 +141,48 @@
             }
         })
     });
+    $('.detailRecipe').click(function(){
+    const name = $(this).val();
+    $.ajax({
+            type:'GET',
+            data:{"recipeName":name},
+            url:'/refrigeratorRecipe/choice',
+            success: function(data){
+                console.log(data);
+                $('#choiceCook').html(data.rep_nm);
+                let html = "<td>"+data.rcp_part+"</td>";
+                let html2 = "<td>"+data.info_eng+"</td>";
+                let cook = "";
+                cook += "<li>";
+                cook += "<pre>";
+                cook += data.manual;
+                cook += "</pre>";
+                cook += "</li>";
+                $('.rcp_part').append(html);
+                $('.info_eng').append(html2);
+                $('.recipeDetails').append(cook);
+                $('.recipePage1').css('display','none');
+                $('.recipeDetail').css('display','block');
+            },
+            error: function(){
+                console.error();
+            }
+        })
+    });
     $('.backbtn').click(function(){
         if($('.checkBlog').css('display')=="block"){
             $('.checkBlog').css('display','none');
             $('.recipeBList *').remove();
             $('.recipePage1').css('display','block');
-        }else{
+        }else if($('.checkVideo').css('display')=="block"){
             $('.checkVideo').css('display','none');
             $('.recipeVList *').remove();
+            $('.recipePage1').css('display','block');
+        }else{
+            $('.recipeDetail').css('display','none');
+            $('.recipeDetails *').remove();
+            $('.rcp_part td').remove();
+            $('.info_eng td').remove();
             $('.recipePage1').css('display','block');
         };
     })

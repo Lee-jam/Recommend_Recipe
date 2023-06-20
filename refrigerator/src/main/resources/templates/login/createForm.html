@@ -24,38 +24,41 @@
                     <div class="form sign-up">
                         <div class="input-group">
                             <i class='bx bxs-user'></i>
-                            <input id="inputName" oninput="validateName()" placeholder="Username" th:field="*{name}" type="text">
+                            <input id="inputName" oninput="validateName()" placeholder="이름" th:field="*{name}"
+                                   type="text">
                             <span id="validateName"></span>
                         </div>
                         <div class="input-group">
                             <i class='bx bx-mail-send'></i>
-                            <input id="email2" oninput="validateEmail()" placeholder="Email" th:field="*{email}" type="email">
-                            <span id="checkEmail"></span>
+                            <input id="email" onchange="validateEmail()" placeholder="이메일" th:field="*{email}" type="email">
+                            <span id="validEmail"></span>
                         </div>
                         <div class="input-group">
                             <i class='bx bxs-user'></i>
-                            <input placeholder="Nickname" th:field="*{nickname}" type="text">
+                            <input id="nickname" name="nickname" oninput="validateNickname()" placeholder="닉네임"
+                                   th:field="*{nickname}" type="text">
+                            <span id="validNickname"></span>
                         </div>
                         <div class="input-group" id="test">
                             <i class='bx bxs-lock-alt'></i>
-                            <input id="PW" oninput="validatePassword()" placeholder="Password" th:field="*{password}" type="password">
+                            <input id="PW" oninput="validatePassword()" placeholder="패스워드" th:field="*{password}"
+                                   type="password">
                             <span id="validatePW"></span>
                         </div>
                         <div class="input-group">
                             <i class='bx bxs-lock-alt'></i>
-                            <input id="checkPW" type="password" placeholder="Confirm Password" oninput="validatePassword()">
+                            <input id="checkPW" oninput="validatePassword()" placeholder="패스워드 확인" type="password">
                             <span id="finalCheckPW"></span>
                         </div>
-                        <button class="button btnPush" type="submit">Sign up</button>
+                        <button class="button btnPush" onclick="checkMail()" type="submit">회원가입</button>
                         <p>
-                            <span>Already have an account?</span>
+                            <span>아이디가 있으신가요?</span>
                             <b class="pointer" onclick="location.href='/member/login'">
-                                Sign in here
+                                로그인으로 이동
                             </b>
                         </p>
                     </div>
                 </div>
-
             </div>
             <!-- END SIGN UP -->
         </div>
@@ -87,136 +90,209 @@
 </div>
 <script src="/js/create.js"></script>
 <script>
-    let pwComplete = 0;
-    let nameComplete = 0;
-    let emailComplete = 0;
+        let pwComplete = 0;
+        let nameComplete = 0;
+        let emailComplete = 0;
+        let nickComplete = 0;
 
-    $('form').submit(function () {
-      if (pwComplete == 1 && nameComplete == 1 && emailComplete == 1) {
-        return true;
-      }
-      else {
-        alert("제대로 입력되지 않았습니다.");
-        return false;
-      }
-    });
+        $('form').submit(function () {
+            if (pwComplete == 1 && nameComplete == 1 && emailComplete == 1 && nickComplete == 1) {
+                alert("회원가입이 완료되었습니다.");
+                return true;
+            }
+            else {
+                alert("제대로 입력되지 않았습니다.");
+                return false;
+            }
+        });
 
-    //validateName Start
-    function checkName(str) {
-      var regex = /^[가-힣]*$/; // 한글 정규표현식
+        //validate check function start
+        function combine(str) {
+            var checkNumAlpha = /[a-z0-9]/;
+            var checkLowercase = /[a-z]/;
+            var checkNumber = /[0-9]/;
+            var checkWildcard = /[!@#$%^&*]/;
+            var checkLength = /^.{8,16}$/
 
-      return regex.test(str);
-    }
 
-    function validateName() {
-      var name = document.getElementById("inputName");
-      var validateName = document.getElementById("validateName");
-
-      if (name.value) {
-        if (!checkName(name.value)) {
-          validateName.innerHTML = "<span style='color:red'>유효하지 않은 입력입니다.</span>"
-          name.style.border = "0.125rem solid red"
-          nameComplete = 0;
-        } else {
-          validateName.innerHTML = "<span style='color:green'>유효한 입력입니다.</span>"
-          name.style.border = "0.125rem solid #4EA685"
-          nameComplete = 1;
+            return checkNumAlpha.test(str) && checkLowercase.test(str) && checkNumber.test(str) && checkWildcard.test(str) && checkLength.test(str);
         }
-      } else {
-        validateName.innerHTML = "";
-        name.style.border = "0.125rem solid white";
-        nameComplete = 0;
-      }
-    }
-    //validateName End
 
-    //validateEmail Strat
-    var email2 = document.getElementById("email2");
-    var checkEmail = document.getElementById("checkEmail");
+        function checkName(str) {
+            var regex = /^[가-힣]*$/;
 
-    function combineEmail(str) {
-      // 이메일 유효성을 체크하는 정규식
-      var regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-      console.log(regex.test(str));
-      return regex.test(str);
-    }
-
-    function validateEmail() {
-      if (email2.value) {
-        if (!combineEmail(email2.value)) {
-          checkEmail.innerHTML = "<span style='color:red'>유효한 이메일이 아닙니다.</span>";
-          email2.style.border = "0.125rem solid red";
-          emailComplete = 0;
-        } else {
-          checkEmail.innerHTML = "<span style='color:green'>유효한 이메일 입니다.</span>";
-          email2.style.border = "0.125rem solid #4EA685";
-          emailComplete = 1;
+            return regex.test(str);
         }
-      } else {
-        checkEmail.innerHTML = "";
-        email2.style.border = "0.125rem solid white";
-        emailComplete = 0;
-      }
-    }
-    //validateEmail End
 
-    //validatePassword Start
-    function combine(str) {
-      var checkNumAlpha = /[a-z0-9]/;
-      var checkLowercase = /[a-z]/;
-      var checkNumber = /[0-9]/;
-      var checkWildcard = /[!@#$%^&*]/;
-      var checkLength = /^.{8,16}$/
+        function isWhitespace(str) {
+            var checkSpace = /^\s+|\s+$/; //앞뒤 공백
 
-
-      return checkNumAlpha.test(str) && checkLowercase.test(str) && checkNumber.test(str) && checkWildcard.test(str) && checkLength.test(str);
-    }
-
-    var PW = document.getElementById("PW");
-    var validatePW = document.getElementById("validatePW");
-    var checkPW = document.getElementById("checkPW");
-    var finalCheckPW = document.getElementById("finalCheckPW");
-
-    function validatePassword() {
-      //Password
-      if (PW.value) {
-        if (!combine(PW.value)) {
-          validatePW.innerHTML = "<span style='color:red'>영문,숫자,특수문자(필수) 조합 8자 이상 16자 이하</span>";
-          PW.style.border = "0.125rem solid red";
-          PW.focus();
-        } else {
-          validatePW.innerHTML = "<span style='color:green'>안전한 비밀번호입니다.</span>";
-          PW.style.border = "0.125rem solid #4EA685"
+            return checkSpace.test(str);
         }
-      } else {
-        validatePW.innerHTML = "";
-        PW.style.border = "0.125rem solid white";
-      }
-
-      //Confirm Password
-      if (PW.value && checkPW.value) {
-        if (PW.value === checkPW.value) {
-          finalCheckPW.innerHTML = "<span style='color:green'>비밀번호가 일치합니다.</span>";
-          checkPW.style.border = "0.125rem solid #4EA685"
-          pwComplete = 1;
-        } else {
-          finalCheckPW.innerHTML = "<span style='color:red'>비밀번호가 불일치합니다.</span>";
-          checkPW.style.border = "0.125rem solid red"
-          pwComplete = 0;
+        function checkKorean(str) {
+            var pattern = /^[a-zA-Z가-힣]+$/;
+            return pattern.test(str);
         }
-      } else {
-        finalCheckPW.innerHTML = "";
-        checkPW.style.border = "0.125rem solid white";
-        pwComplete = 0;
-      }
-    }
-    //validatePassword End
+
+        function checkSpace(str) {
+            var blank_pattern = /[\s]/g;
+
+            return blank_pattern.test(str)
+        }
+        //validate check function end
+
+        //validateName Start
+        function validateName() {
+            var name = document.getElementById("inputName");
+            var validateName = document.getElementById("validateName");
+
+            if (name.value) {
+                if (!checkName(name.value)) {
+                    validateName.innerHTML = "<span style='color:red'>한글만 입력 가능합니다.</span>"
+                    name.style.border = "0.125rem solid red"
+                    nameComplete = 0;
+                } else {
+                    validateName.innerHTML = "<span style='color:green'>유효한 입력입니다.</span>"
+                    name.style.border = "0.125rem solid #4EA685"
+                    nameComplete = 1;
+                }
+            } else {
+                validateName.innerHTML = "";
+                name.style.border = "0.125rem solid white";
+                nameComplete = 0;
+            }
+        }
+        //validateName End
+
+        //validateEmail Start
+        function validateEmail() {
+            var token = $("meta[name='_csrf']").attr("content");
+            var header = $("meta[name='_csrf_header']").attr("content");
+            var email = $("#email").val();
+            var spanEmail = document.getElementById("validEmail");
+
+            if (email) {
+                $.ajax({
+                    url: "/member/idChk",
+                    type: "post",
+                    dataType: 'json',
+                    data: email,
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader(header, token);
+                    },
+                    success: function (result) {
+                        if (checkSpace(email)) {
+                            spanEmail.innerHTML = "<span style='color:red'>잘못된 입력입니다.</span>";
+                            document.getElementById("email").style.border = "0.125rem solid red";
+                            emailComplete = 0;
+                        }
+                        else {
+                            var dupleCheck = result.usableEmail;
+                            if (dupleCheck == false) {
+                                spanEmail.innerHTML = "<span style='color:red'>중복 이메일입니다.</span>";
+                                document.getElementById("email").style.border = "0.125rem solid red"
+                                emailComplete = 0;
+                            }
+                            else if (dupleCheck == true) {
+                                spanEmail.innerHTML = "<span style='color:green'>사용가능한 이메일입니다.</span>";
+                                document.getElementById("email").style.border = "0.125rem solid #4EA685"
+                                emailComplete = 1;
+                            }
+                        }
+                    }
+                })
+            }
+            else {
+                spanEmail.innerHTML = "";
+                document.getElementById("email").style.border = "0.125rem solid white";
+            }
+        }
+        //validateEmail End
+
+        //validateNickname Start
+        function validateNickname() {
+            var token = $("meta[name='_csrf']").attr("content");
+            var header = $("meta[name='_csrf_header']").attr("content");
+            var nickname = $("#nickname").val();
+            var spanNickname = document.getElementById("validNickname")
 
 
+            if (nickname) {
+                $.ajax({
+                    url: "/member/nickChk",
+                    type: "post",
+                    dataType: 'json',
+                    data: nickname,
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader(header, token);
+                    },
+                    success: function (result) {
+                        if (isWhitespace(nickname) || checkSpace(nickname) || !checkKorean(nickname)) {
+                            spanNickname.innerHTML = "<span style='color:red'>잘못된 입력입니다.</span>";
+                            document.getElementById("nickname").style.border = "0.125rem solid red";
+                            nickComplete = 0;
+                        } else {
+                            var dupleNick = result.result;
+                            if (dupleNick == false) {
+                                spanNickname.innerHTML = "<span style='color:red'>중복 닉네임입니다.</span>";
+                                document.getElementById("nickname").style.border = "0.125rem solid red";
+                                nickComplete = 0;
+                            }
+                            else if (dupleNick == true) {
+                                spanNickname.innerHTML = "<span style='color:green'>사용가능한 닉네임입니다.</span>";
+                                document.getElementById("nickname").style.border = "0.125rem solid #4EA685";
+                                nickComplete = 1;
+                            }
+                        }
+                    }
+                })
+            } else {
+                spanNickname.innerHTML = "";
+                document.getElementById("nickname").style.border = "0.125rem solid white";
+            }
+        }
+        //validateNickname End
 
+        //validatePassword Start
+        var PW = document.getElementById("PW");
+        var validatePW = document.getElementById("validatePW");
+        var checkPW = document.getElementById("checkPW");
+        var finalCheckPW = document.getElementById("finalCheckPW");
 
-
-
+        function validatePassword() {
+            //Password
+            if (PW.value) {
+                if (!combine(PW.value)) {
+                    validatePW.innerHTML = "<span style='color:red'>영문,숫자,특수문자(필수) 조합 8자 이상 16자 이하</span>";
+                    PW.style.border = "0.125rem solid red";
+                    PW.focus();
+                } else {
+                    validatePW.innerHTML = "<span style='color:green'>안전한 비밀번호입니다.</span>";
+                    PW.style.border = "0.125rem solid #4EA685"
+                }
+            } else {
+                validatePW.innerHTML = "";
+                PW.style.border = "0.125rem solid white";
+            }
+            //Confirm Password
+            if (PW.value && checkPW.value) {
+                if (PW.value === checkPW.value) {
+                    finalCheckPW.innerHTML = "<span style='color:green'>비밀번호가 일치합니다.</span>";
+                    checkPW.style.border = "0.125rem solid #4EA685"
+                    pwComplete = 1;
+                } else {
+                    finalCheckPW.innerHTML = "<span style='color:red'>비밀번호가 불일치합니다.</span>";
+                    checkPW.style.border = "0.125rem solid red"
+                    pwComplete = 0;
+                }
+            } else {
+                finalCheckPW.innerHTML = "";
+                checkPW.style.border = "0.125rem solid white";
+                pwComplete = 0;
+            }
+        }
+        //validatePassword End
 </script>
 </body>
+
 </html>

@@ -88,6 +88,34 @@ ul{
 .main_position{
     margin: 15% 25%;
 }
+.main_position2{
+    display : flex;
+    height : 100%;
+}
+.recipeBoard{
+    background-image: url('../img/레시피 페이퍼.svg');
+    background-size : cover;
+    margin: auto auto 0;
+    width: 40%;
+    height: 93%;
+}
+.recipeContent{
+    margin:15% 5% 0;
+
+}
+.cookName{
+    margin: 0 auto;
+    text-align: center;
+    font-size: x-large;
+
+}
+.recipeContent input{
+    background: none;
+    border: none;
+    display: block;
+    outline:none;
+}
+
 .main_set{
     width:100vw;
     position : relative;
@@ -169,6 +197,7 @@ ul{
 #main_outline{
     display:flex;
     flex-direction: row;
+    height:100%
 }
 .ref_btn{
     background:none;
@@ -274,6 +303,9 @@ h3,h2{
     margin-left: 5px;
 }
 .checkBlog{
+    display:none;
+}
+.recipeDetail{
     display:none;
 }
 .checkVideo{

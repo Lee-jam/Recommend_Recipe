@@ -21,7 +21,7 @@ import java.util.List;
 public class RecipeController {
     private final RecipeApiService recipeApiService;
 
-    @GetMapping(value ="")
+    @GetMapping(value ="/")
     public String recipe(Principal principal, Model model){
 
         if(principal==null){
@@ -47,8 +47,15 @@ public class RecipeController {
         List<VideoDTO> videoList =recipeApiService.searchvideoRecipe(recipeName);
         return videoList;
     }
+    @GetMapping("/choice")
+    @ResponseBody
+    public RecipeApiDTO RecipeDetail(String recipeName){
+        System.out.println(recipeName);
+        RecipeApiDTO recipeDetails =recipeApiService.recipeDetails(recipeName);
+        return recipeDetails;
+    }
 
-    @GetMapping("api/recipe/set")
+    @GetMapping("/api/recipe/set")
     @ResponseBody
     public String recipeSet(){
         recipeApiService.recipeApiSave();

@@ -1,11 +1,16 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <meta charset="UTF-8">
     <meta content="IE=edge" http-equiv="X-UA-Compatible">
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>Login</title>
     <link href="/css/login.css" rel="stylesheet" type="text/css"/>
+    <link href="/css/phoneCheck.css" rel="stylesheet" type="text/css"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 </head>
 <body>
 <div class="container" id="container">
@@ -49,17 +54,12 @@
                             </a>
                         </div>
                         <p>
-                            <b>
-                                Forgot password?
-                            </b>
+                            <b class="pointer" onclick="location.href='/member/findPW'">이메일 찾기</b>
+                            <b class="pointer" onclick="location.href='/member/findEmail'">비밀번호 찾기</b>
                         </p>
                         <p>
-                  <span>
-                    Don't have an account?
-                  </span>
-                            <b class="pointer" onclick="location.href='/member/new'">
-                                Sign up here
-                            </b>
+                            <span>회원이 아니신가요?</span>
+                            <b class="pointer" id="PhoneCheck">회원가입으로 이동</b>
                         </p>
                     </div>
                 </div>
@@ -87,6 +87,32 @@
     </div>
     <!-- END CONTENT SECTION -->
 </div>
+<div id="phoneCheckDiv">
+<div class="phoneForm">
+
+    <div class="phoneFromIn">
+        <button id="closePhone"><i class="far fa-times fa-2x" style="color: #767676; font-weight:600;"></i></button>
+        <h3>핸드폰 인증</h3>
+        <br><br>
+        <div class="phoneGroup">
+            <div>
+                <input id="phoneNum" placeholder="'-' 빼고 입력해주세요">
+                <button id="sendPhoneBtn">인증번호 전송</button>
+            </div>
+            <br>
+            <span id="spanPhoneNum"></span>
+        </div>
+        <div class="phoneGroup">
+            <div>
+                <input id="checkInput" placeholder="인증번호">
+                <button id="confirmBtn">확인</button>
+            </div>
+        </div>
+        <br><br>
+    </div>
+</div>
+</div>
+
 <script src="/js/login.js"></script>
 </body>
 </html>

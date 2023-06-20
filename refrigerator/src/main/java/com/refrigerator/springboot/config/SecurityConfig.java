@@ -24,13 +24,18 @@ public class SecurityConfig {
                 .loginPage("/member/login")
                 .defaultSuccessUrl("/")
                 .usernameParameter("email")
-                .failureUrl("/member/login/error")
+                .failureUrl("/member/error")
                 .and()
                 .oauth2Login()
                 .and()
                 .logout()
                 .logoutRequestMatcher(new AntPathRequestMatcher("/member/logout"))
                 .logoutSuccessUrl("/")
+        ;
+        http.authorizeRequests()
+                .mvcMatchers("/", "/random","/member/**", "/loginCheck","/refrigeratorRecipe/**","/board/**","/auth/**", "/img/**").permitAll()
+                .mvcMatchers("/css/**", "/js/**").permitAll()
+                .anyRequest().authenticated()
         ;
 
         return http.build();

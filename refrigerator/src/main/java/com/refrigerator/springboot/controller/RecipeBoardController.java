@@ -207,4 +207,13 @@ public class RecipeBoardController {
 		return ResponseEntity.ok(commentId);
 	}
 
+	@PostMapping("/randomRecipeSave")
+	public String randomRecipeWrite(Principal principal){
+		if(principal==null){
+			return "redirect:/loginCheck";
+		}
+
+		return "redirect:board/recipeWrite";
+	}
+
 }

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <meta charset="UTF-8">
+    <meta content="IE=edge" http-equiv="X-UA-Compatible">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+    <title>Login</title>
+    <link href="/css/style2.css" rel="stylesheet" type="text/css"/>
+</head>
+
+<body>
+<div class="container" id="container">
+    <!-- FORM SECTION -->
+    <form action="/member/socialReg" method="get" role="form">
+        <input th:name="${_csrf.parameterName}" th:value="${_csrf.token}" type="hidden">
+        <div class="row">
+            <!-- SIGN UP -->
+            <div class="col align-items-center flex-col sign-up">
+                <div class="form-wrapper align-items-center">
+                    <div class="form sign-up">
+                        <div class="input-group">
+                            <i class='bx bx-mail-send'></i>
+                            <input autofocus id="email" name="email" onblur="validateEmail()" placeholder="이메일" th:value="${email}" type="email">
+                            <span id="validEmail"></span>
+                        </div>
+                        <div class="input-group">
+                            <i class='bx bxs-user'></i>
+                            <input id="nickname" name="nickname" onblur="validateNickname()" placeholder="닉네임" th:value="${nickname}" type="text">
+                            <span id="validNickname"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- END SIGN UP -->
+        </div>
+    </form>
+    <!-- END FORM SECTION -->
+    <!-- CONTENT SECTION -->
+    <div class="row content-row">
+        <!-- SIGN IN CONTENT -->
+        <div class="col align-items-center flex-col">
+            <div class="text sign-in">
+                <h2>
+                    Welcome
+                </h2>
+            </div>
+        </div>
+        <!-- END SIGN IN CONTENT -->
+        <!-- SIGN UP CONTENT -->
+        <div class="col align-items-center flex-col">
+            <div class="text sign-up">
+                <h2>
+                    Join with us
+                </h2>
+
+            </div>
+        </div>
+        <!-- END SIGN UP CONTENT -->
+    </div>
+    <!-- END CONTENT SECTION -->
+</div>
+<script src="/js/login2.js"></script>
+<script>
+    let emailComplete = 0;
+    let nickComplete = 0;
+
+    $('form').submit(function () {
+      if (emailComplete == 1 && nickComplete == 1) {
+        alert("회원가입이 완료되었습니다.");
+        return true;
+      }
+      else {
+        alert("제대로 입력되지 않았습니다.");
+        return false;
+      }
+    });
+
+    //validate check function start
+    function isWhitespace(str) {
+      var checkSpace = /^\s+|\s+$/; //앞뒤 공백
+
+      return checkSpace.test(str);
+    }
+    function checkKorean(str){
+        var pattern = /^[a-zA-Z가-힣]+$/;
+        return pattern.test(str);
+    }
+
+    function checkSpace(str) {
+      var blank_pattern = /[\s]/g;
+
+      return blank_pattern.test(str)
+    }
+    //validate check function end
+
+    //validateEmail Start
+    function validateEmail() {
+      var token = $("meta[name='_csrf']").attr("content");
+      var header = $("meta[name='_csrf_header']").attr("content");
+      var email = $("#email").val();
+      var spanEmail = document.getElementById("validEmail");
+
+      if (email) {
+        $.ajax({
+          url: "/member/idChk",
+          type: "post",
+          dataType: 'json',
+          data: email,
+          beforeSend: function (xhr) {
+            xhr.setRequestHeader(header, token);
+          },
+          success: function (result) {
+            if (checkSpace(email)) {
+              spanEmail.innerHTML = "<span style='color:red'>잘못된 입력입니다.</span>";
+              document.getElementById("email").style.border = "0.125rem solid red";
+              emailComplete = 0;
+            }
+            else {
+              var dupleCheck = result.usableEmail;
+              if (dupleCheck == false) {
+                spanEmail.innerHTML = "<span style='color:red'>중복 이메일입니다.</span>";
+                document.getElementById("email").style.border = "0.125rem solid red"
+                emailComplete = 0;
+              }
+              else if (dupleCheck == true) {
+                spanEmail.innerHTML = "<span style='color:green'>사용가능한 이메일입니다.</span>";
+                document.getElementById("email").style.border = "0.125rem solid #4EA685"
+                emailComplete = 1;
+              }
+            }
+          }
+        })
+      }
+      else {
+        spanEmail.innerHTML = "";
+        document.getElementById("email").style.border = "0.125rem solid white";
+      }
+    }
+    //validateEmail End
+
+    //validateNickname Start
+    function validateNickname() {
+      var token = $("meta[name='_csrf']").attr("content");
+      var header = $("meta[name='_csrf_header']").attr("content");
+      var nickname = $("#nickname").val();
+      var spanNickname = document.getElementById("validNickname")
+
+
+      if (nickname) {
+        $.ajax({
+          url: "/member/nickChk",
+          type: "post",
+          dataType: 'json',
+          data: nickname,
+          beforeSend: function (xhr) {
+            xhr.setRequestHeader(header, token);
+          },
+          success: function (result) {
+            if (isWhitespace(nickname) || checkSpace(nickname) || !checkKorean(nickname)) {
+              spanNickname.innerHTML = "<span style='color:red'>잘못된 입력입니다.</span>";
+              document.getElementById("nickname").style.border = "0.125rem solid red";
+              nickComplete = 0;
+            } else {
+              var dupleNick = result.result;
+              if (dupleNick == false) {
+                spanNickname.innerHTML = "<span style='color:red'>중복 닉네임입니다.</span>";
+                document.getElementById("nickname").style.border = "0.125rem solid red";
+                nickComplete = 0;
+              }
+              else if (dupleNick == true) {
+                spanNickname.innerHTML = "<span style='color:green'>사용가능한 닉네임입니다.</span>";
+                document.getElementById("nickname").style.border = "0.125rem solid #4EA685";
+                nickComplete = 1;
+              }
+            }
+          }
+        })
+      } else {
+        spanNickname.innerHTML = "";
+        document.getElementById("nickname").style.border = "0.125rem solid white";
+      }
+    }
+    //validateNickname End
+
+
+
+</script>
+</body>
+
+</html>

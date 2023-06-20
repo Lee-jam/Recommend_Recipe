@@ -209,6 +209,15 @@ public class RecipeApiService {
         return videoDTOList;
     }
 
+    public RecipeApiDTO recipeDetails(String recipeName) {
+        RecipeAPI recipeAPI = recipeApiRepository.getRecipefindByName(recipeName);
+        String manual=recipeAPI.getManual();
+        manual = manual.replaceAll("\\+","\\n");
+
+        RecipeApiDTO recipeApiDTO = new RecipeApiDTO(recipeAPI.getRep_nm(),recipeAPI.getInfo_eng(),recipeAPI.getRcp_part(),recipeAPI.getManual());
+        return recipeApiDTO;
+    }
+
 //    public List<BlogDTO> searchBlogRecipe(String recipeName){
 ////        https://www.googleapis.com/customsearch/v1?key=AIzaSyBZLPQK4Kx0sTV4KTAPd_4upJbO1I2UUyI&cx=a3b4bb7e3ad21457b&q=김치찌개 레시피
 //        recipeName = recipeName.replace(" ","");

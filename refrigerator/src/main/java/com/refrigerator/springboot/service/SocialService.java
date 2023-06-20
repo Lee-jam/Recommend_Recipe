@@ -1,6 +1,7 @@
 package com.refrigerator.springboot.service;
 
 import com.refrigerator.springboot.attributes.OAuthAttributes;
+import com.refrigerator.springboot.constant.Role;
 import com.refrigerator.springboot.dto.MemberDto;
 import com.refrigerator.springboot.entity.Member;
 import com.refrigerator.springboot.repository.SocialRepository;
@@ -35,19 +36,19 @@ public class SocialService implements OAuth2UserService<OAuth2UserRequest, OAuth
         String userNameAttributeName = userRequest.getClientRegistration().getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName();
 
         OAuthAttributes attributes = OAuthAttributes.of(registrationId, userNameAttributeName, oAuth2User.getAttributes());
+
         Member user = saveOrUpdate(attributes);
         httpSession.setAttribute("user", new MemberDto(user));
 
         return new DefaultOAuth2User(
-                Collections.singleton(new SimpleGrantedAuthority(user.getRoleKey())),
+                Collections.singleton(new SimpleGrantedAuthority(Role.USER.getKey())),
                 attributes.getAttributes(),
-                attributes.getNameAttributeKey()
-        );
+                attributes.getNameAttributeKey());
+
     }
 
     private Member saveOrUpdate(OAuthAttributes attributes) {
-        System.out.println(attributes.getAttributes());
-        Member user = userRepository.findByEmail(attributes.getEmail()) //이메일 있는지 없는지 찾고
+        Member user = userRepository.findByEmailAndLoginType(attributes.getEmail(), attributes.toEntity().getLoginType()) //이메일 있는지 없는지 찾고
                 .map(entity -> entity.update(attributes.getName())) // 이메일이 있으면 업데이트
                 .orElse(attributes.toEntity()); // 없으면 DB에 넣기
 
